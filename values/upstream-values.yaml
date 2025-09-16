@@ -1,9 +1,28 @@
-# Copyright 2024 Defense Unicorns
+# Copyright 2025 Defense Unicorns
 # SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-Defense-Unicorns-Commercial
 
-# Values for upstream flavor
+registry: docker.io
+# renovate: datasource=docker depName=docker.io/neuvector/controller versioning=docker
+tag: "5.4.6"
+manager:
+  image:
+    repository: neuvector/manager
+enforcer:
+  image:
+    repository: neuvector/enforcer
 
-# Example variables from UDS package repo template. Update to relevant variables after templating
-# image:
-#   repository: upstream/image
-#   tag: 1.2.3
+controller:
+  image:
+    repository: neuvector/controller
+
+cve:
+  scanner:
+    image:
+      repository: neuvector/scanner
+      tag: latest
+
+  updater:
+    enabled: true
+    image:
+      repository: neuvector/updater
+      tag: latest

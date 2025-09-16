@@ -1,4 +1,4 @@
-# Copyright 2024 Defense Unicorns
+# Copyright 2025 Defense Unicorns
 # SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-Defense-Unicorns-Commercial
 
 includes:
@@ -35,7 +35,9 @@ tasks:
       - task: create:package
       - task: create:test-bundle
       - task: deploy:test-bundle
-      - task: setup:create-doug-user
+      - task: setup:keycloak-user
+        with:
+          group: "/UDS Core/Admin"
       - task: test:all
 
   - name: dev

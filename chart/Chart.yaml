@@ -1,9 +1,9 @@
-# Copyright 2024 Defense Unicorns
+# Copyright 2025 Defense Unicorns
 # SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-Defense-Unicorns-Commercial
 
 apiVersion: v2
-name: uds-#TEMPLATE_APPLICATION_NAME#-config
-description: uds-#TEMPLATE_APPLICATION_NAME#-config
+name: uds-neuvector-config
+description: uds-neuvector-config
 
 # A chart can be either an 'application' or a 'library' chart.
 #

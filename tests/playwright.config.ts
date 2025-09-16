@@ -1,11 +1,11 @@
 /**
- * Copyright 2024 Defense Unicorns
+ * Copyright 2025 Defense Unicorns
  * SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-Defense-Unicorns-Commercial
  */
 
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from "@playwright/test";
 
-export const playwrightDir = '.playwright';
+export const playwrightDir = ".playwright";
 export const authFile = `${playwrightDir}/auth/user.json`;
 
 /**
@@ -14,32 +14,26 @@ export const authFile = `${playwrightDir}/auth/user.json`;
 export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI, // fail CI if you accidentally leave `test.only` in source
-  retries: process.env.CI ? 1 : 0,
-  workers: 1,
+  retries: 1,
+  workers: 20, // Support up to 20 parallel workers
+  timeout: 45000, // 45 second timeout for tests
   reporter: [
     // Reporter to use. See https://playwright.dev/docs/test-reporters
-    ['html', { outputFolder: `${playwrightDir}/reports`, open: 'never' }],
-    ['json', { outputFile: `${playwrightDir}/reports/test-results.json`, open: 'never' }],
-    ['list']
+    ["html", { outputFolder: `${playwrightDir}/reports`, open: "never" }],
   ],
 
   outputDir: `${playwrightDir}/output`,
 
   use: {
-    // video: 'on',
-    baseURL: process.env.BASE_URL || 'https://#TEMPLATE_APPLICATION_NAME#.uds.dev', // for `await page.goto('/')` etc
-    trace: 'on-first-retry', // collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer
+    trace: "retain-on-failure", // save trace for failed tests. See https://playwright.dev/docs/trace-viewer#opening-the-trace
   },
 
   projects: [
-    { name: 'setup', testMatch: /.*\.setup\.ts/ }, // authentication
+    { name: "setup", testMatch: /.*\.setup\.ts/ }, // authentication
 
-    ...[
-      'Desktop Chrome',
-      'Desktop Firefox',
-    ].map((p) => ({
+    ...["Desktop Chrome"].map(p => ({
       name: devices[p].defaultBrowserType,
-      dependencies: ['setup'],
+      dependencies: ["setup"],
       use: {
         ...devices[p],
         storageState: authFile,

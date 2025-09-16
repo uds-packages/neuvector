@@ -1,5 +1,5 @@
 {
-  "name": "uds-package-#TEMPLATE_APPLICATION_NAME#",
+  "name": "uds-package-neuvector",
   "license": "Apache-2.0",
   "devDependencies": {
     "@playwright/test": "^1.49.0",

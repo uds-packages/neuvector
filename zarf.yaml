@@ -1,46 +1,50 @@
-# Copyright 2024 Defense Unicorns
+# Copyright 2025 Defense Unicorns
 # SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-Defense-Unicorns-Commercial
 
 # yaml-language-server: $schema=https://raw.githubusercontent.com/defenseunicorns/zarf/main/zarf.schema.json
 kind: ZarfPackageConfig
 metadata:
-  name: #TEMPLATE_APPLICATION_NAME#
-  description: "UDS #TEMPLATE_APPLICATION_DISPLAY_NAME# package"
+  name: neuvector
+  description: "Full Lifecycle Container Security Platform NeuVector provides comprehensive runtime security for containers, including vulnerability scanning, threat detection, compliance monitoring, and network segmentation for Kubernetes environments."
   version: "dev"
   annotations:
-    dev.uds.title: #TEMPLATE_APPLICATION_DISPLAY_NAME#
-    dev.uds.tagline: ""
-    dev.uds.categories: ""
-    dev.uds.keywords: ""
+    dev.uds.title: NeuVector
+    dev.uds.tagline: "Full Lifecycle Container Security Platform"
+    dev.uds.categories: "Security, Monitoring, Compliance"
+    dev.uds.keywords: "Container Security, Runtime Protection, Vulnerability Scanning, Kubernetes Security, Network Segmentation"
+    # TODO: Add icon here
     dev.uds.icon: ""
 
 variables:
-  - name: EXAMPLE_VARIABLES
-    default: "examples"
   - name: DOMAIN
+    description: "Cluster domain"
     default: "uds.dev"
-  - name: EXAMPLE_DB_USERNAME
-    default: "example_username"
-  - name: EXAMPLE_DB_ENDPOINT
-    default: "example_db_endpoint"
+
+  - name: ADMIN_DOMAIN
+    description: "Domain for admin services, defaults to `admin.DOMAIN`"
 
 components:
-  - name: #TEMPLATE_APPLICATION_NAME#
+  - name: neuvector
     required: true
-    description: "Deploy #TEMPLATE_APPLICATION_DISPLAY_NAME#"
+    description: "Deploy NeuVector"
     import:
       path: common
     only:
       flavor: upstream
     charts:
-      - name: #TEMPLATE_APPLICATION_NAME#
+      - name: core
         valuesFiles:
           - values/upstream-values.yaml
-    images: []
+    images:
+      - docker.io/neuvector/controller:5.4.6
+      - docker.io/neuvector/manager:5.4.6
+      - docker.io/neuvector/updater:latest
+      - docker.io/neuvector/scanner:latest
+      - docker.io/neuvector/enforcer:5.4.6
 
-  - name: #TEMPLATE_APPLICATION_NAME#
+  - name: neuvector
     required: true
-    description: "Deploy #TEMPLATE_APPLICATION_DISPLAY_NAME#"
+    description: "Deploy NeuVector"
     import:
       path: common
     only:
@@ -48,20 +52,30 @@ components:
       cluster:
         architecture: amd64
     charts:
-      - name: #TEMPLATE_APPLICATION_NAME#
+      - name: core
         valuesFiles:
           - values/registry1-values.yaml
-    images: []
+    images:
+      - registry1.dso.mil/ironbank/neuvector/neuvector/controller:5.4.6
+      - registry1.dso.mil/ironbank/neuvector/neuvector/manager:5.4.6
+      - registry1.dso.mil/ironbank/redhat/ubi/ubi9-minimal:9.6
+      - registry1.dso.mil/ironbank/neuvector/neuvector/scanner:6
+      - registry1.dso.mil/ironbank/neuvector/neuvector/enforcer:5.4.6
 
-  - name: #TEMPLATE_APPLICATION_NAME#
+  - name: neuvector
     required: true
-    description: "Deploy #TEMPLATE_APPLICATION_DISPLAY_NAME#"
+    description: "Deploy NeuVector"
     import:
       path: common
     only:
       flavor: unicorn
     charts:
-      - name: #TEMPLATE_APPLICATION_NAME#
+      - name: core
         valuesFiles:
           - values/unicorn-values.yaml
-    images: []
+    images:
+      - quay.io/rfcurated/neuvector/controller:5.4.6-jammy-scratch-fips-rfcurated
+      - quay.io/rfcurated/neuvector/manager:5.4.6-jammy-scratch-fips-rfcurated
+      - quay.io/rfcurated/neuvector/enforcer:5.4.6-jammy-scratch-fips-rfcurated
+      - quay.io/rfcurated/curl:8.15.0-jammy-scratch-fips-rfcurated
+      - quay.io/rfcurated/neuvector/scanner:latest-jammy-scratch-fips-rfcurated
