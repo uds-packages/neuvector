@@ -2,7 +2,7 @@
 
 This package is designed to be deployed on [UDS Core](https://github.com/defenseunicorns/uds-core) and is based on the upstream [NeuVector](https://neuvector.github.io/neuvector-helm/) chart.
 
-> INSERT HERE 1-2 sentence summary of what the application does.
+NeuVector is a comprehensive container security platform that provides runtime protection, vulnerability management, and compliance monitoring for Kubernetes environments. It offers full-lifecycle container security including network segmentation, behavior monitoring, and threat detection for cloud-native applications.
 
 ## Pre-requisites
 
