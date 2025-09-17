@@ -10,7 +10,7 @@ The NeuVector Package expects to be deployed on top of [UDS Core](https://github
 
 ### Dependency information
 
-- requires at a minimum `base` and `core-identity` (keycloak) UDS Core layers deployed
+- requires at a minimum `base` and `identity-authorization` (keycloak) UDS Core layers deployed
 
 ## Flavors
 
