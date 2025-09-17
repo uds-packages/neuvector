@@ -8,9 +8,9 @@ NeuVector is a comprehensive container security platform that provides runtime p
 
 The NeuVector Package expects to be deployed on top of [UDS Core](https://github.com/defenseunicorns/uds-core) with the dependencies listed below being configured prior to deployment.
 
-#### Dependency information
+### Dependency information
 
-Add any dependency information here
+- requires at a minimum `base` and `core-identity` (keycloak) UDS Core layers deployed
 
 ## Flavors
 
@@ -18,7 +18,7 @@ Add any dependency information here
 | ------ | ----------- | ---------------- |
 | `upstream` | Uses upstream images within the package. | `zarf package create . -f upstream` |
 | `registry1` | Uses images from registry1.dso.mil within the package | `zarf package create . -f registry1` |
-| `unicorn` | Uses images from chainguard within the package | `zarf package create . -f unicorn` |
+| `unicorn` | Uses hardened unicorn images within the package | `zarf package create . -f unicorn` |
 
 ## Releases
 

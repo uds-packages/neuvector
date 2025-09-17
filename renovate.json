@@ -21,13 +21,6 @@
       "commitMessageTopic": "package-deps",
       "matchPackageNames": ["!/^mcr\\.microsoft\\.com\\/playwright$/"],
       "matchDatasources": ["docker", "helm", "git-tags"]
-    },
-    {
-      "groupName": "NeuVector Package Dependencies",
-      "labels": ["package-deps"],
-      "commitMessageTopic": "package-deps",
-      "matchPackageNames": ["https://repo1.dso.mil/path/to/application.git"],
-      "allowedVersions": "/^8.+-bb.+/"
     }
   ]
 }
