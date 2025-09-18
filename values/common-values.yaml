@@ -1,18 +1,58 @@
-# Copyright 2024 Defense Unicorns
+# Copyright 2025 Defense Unicorns
 # SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-Defense-Unicorns-Commercial
 
-# Values common to all flavors
+leastPrivilege: true
+autoGenerateCert: false
+rbac: true
+manager:
+  env:
+    ssl: false
+  svc:
+    type: ClusterIP
+  probes:
+    enabled: true
+  podLabels:
+    istio.io/use-waypoint: "neuvector-manager-waypoint"
+    istio.io/ingress-use-waypoint: "true"
 
-# Example variables from UDS package repo template. Update to relevant variables after templating
-# imagePullSecrets:
-#   - name: "private-registry"
+internal:
+  autoRotateCert: true
 
-# postgresql:
-#   enabled: false
-#   postgresqlServer: ###ZARF_VAR_EXAMPLE_DB_ENDPOINT###
-#   existingSecret: "example-postgres"
-#   existingSecretPasswordKey: "password"
-#   postgresqlUsername: ###ZARF_VAR_EXAMPLE_DB_USERNAME###
-#   postgresqlDatabase: ###ZARF_VAR_EXAMPLE_DB_NAME###
-#   service:
-#     port: 5432
+controller:
+  apisvc:
+    type: ClusterIP
+  configmap:
+    enabled: true
+    data:
+      sysinitcfg.yaml: |
+        always_reload: true
+        no_telemetry_report: true
+        scan_config:
+          auto_scan: true
+        mode_auto_d2m: true
+        mode_auto_d2m_duration: 129600
+  secret:
+    enabled: false
+  env:
+    - name: NO_DEFAULT_ADMIN
+      value: "1"
+  internal:
+    certificate:
+      secret: neuvector-internal-cert
+
+enforcer:
+  internal:
+    certificate:
+      secret: neuvector-internal-cert
+
+cve:
+  updater:
+    enabled: true
+  scanner:
+    internal:
+      certificate:
+        secret: neuvector-internal-cert
+
+crdwebhook:
+  enabled: false
+  type: ClusterIP

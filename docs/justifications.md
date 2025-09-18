@@ -1,13 +1,12 @@
-# UDS Package #TEMPLATE_APPLICATION_DISPLAY_NAME#
+# UDS Package NeuVector
 
-Details about the #TEMPLATE_APPLICATION_DISPLAY_NAME# package and requirements of [badging](https://github.com/defenseunicorns/uds-common/blob/main/docs/uds-packages/requirements/uds-package-requirements.md) that may not yet be met.
+## Exemptions
 
-<!-- Recommendation is to provide sufficient details for a package maintainer to quickly understand why an integration is or is not implemented, when the implementation is outside the bounds of a normal scenario.-->
+Neuvector requires elevated privileges to perform its container security functions.
 
-<!--
-Example: "The Upstream implementation of APP_XYZ does not expose a metrics endpoint, issue [#123](https://upstream.project/issue/123) has been opened to track this feature request."
--->
+## Metrics
 
-## <Requirement X> 
-
-### Additional Information
+NeuVector does not have a way to expose any metrics to Prometheus without it being behind  a login.  Therefore we can not scrape metrics for NeuVector at this time.
+ref:
+- https://github.com/neuvector/prometheus-exporter/issues/41
+- https://github.com/neuvector/neuvector-helm/issues/435

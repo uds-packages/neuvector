@@ -1,77 +1,85 @@
-# Copyright 2024 Defense Unicorns
+# Copyright 2025 Defense Unicorns
 # SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-Defense-Unicorns-Commercial
 
 tasks:
   - name: all
     actions:
       - task: health-check
-      # - task: custom-resource-test
       - task: ingress
-      - task: ui
+      - task: e2e
 
   # Ensure application deploys successfully and becomes available
   - name: health-check
     actions:
-      - description: #TEMPLATE_APPLICATION_DISPLAY_NAME# Health Check
+      - description: Wait for NeuVector Job Completion
+        cmd: |
+          # On upgrades there may be cert rotation jobs or other jobs that run
+          if ./uds zarf tools kubectl get jobs -n neuvector --no-headers 2>/dev/null | grep -q .; then
+            ./uds zarf tools kubectl wait --for=condition=complete job --all -n neuvector --timeout=5m
+          fi
+      - description: Validate NeuVector Controller
         wait:
           cluster:
             kind: Deployment
-            name: #TEMPLATE_APPLICATION_NAME#
-            namespace: #TEMPLATE_APPLICATION_NAME#
+            name: neuvector-controller-pod
             condition: Available
-
-  # # If application manages custom resources, then test creating custom resources
-  # - name: custom-resource-test
-  #   description: Test creating a custom resource
-  #   actions:
-  #     # Create test zarf package
-  #     - cmd: |
-  #         ./uds zarf package create --confirm
-  #       dir: tests/optional-example-zarf-tests
-  #     # Generate some kind of test data. In this example it is a certificate
-  #     - cmd: |
-  #         openssl req -x509 -newkey rsa:4096 -keyout testCA.key \
-  #           -out testCA.pem -sha256 -days 3650 -nodes -subj "/C=XX/ST=StateName/L=CityName/O=CompanyName/OU=CompanySectionName/CN=CommonNameOrHostname"
-  #       dir: tests/optional-example-zarf-tests
-  #     # Deploy package with test data
-  #     - cmd: |
-  #         ./uds zarf package deploy \
-  #           --set EXAMPLE_SECRET_VALUE="$(cat testCA.pem | base64 -w 0)" \
-  #           zarf-package-example-zarf-tests-"${UDS_ARCH}"-0.0.1.tar.zst \
-  #           --confirm
-  #       dir: tests/optional-example-zarf-tests
-  #     # Ensure expected resource is generated in some namespace. In this example it is checking for a configmap
-  #     - description: Ensure configmap is created in target namespace
-  #       wait:
-  #         cluster:
-  #           kind: configmap
-  #           name: example-configmap
-  #           namespace: example-ns
-  #     # Cleanup files used to generate test data
-  #     - cmd: |
-  #         rm testCA.key testCA.pem
-  #       dir: tests/optional-example-zarf-tests
+            namespace: neuvector
+      - description: Validate NeuVector Enforcer
+        wait:
+          cluster:
+            kind: Pod
+            name: app=neuvector-enforcer-pod
+            condition: Ready
+            namespace: neuvector
+      - description: Validate NeuVector Manager
+        wait:
+          cluster:
+            kind: Deployment
+            name: neuvector-manager-pod
+            condition: Available
+            namespace: neuvector
+      - description: Validate NeuVector Interface
+        wait:
+          network:
+            protocol: https
+            address: neuvector.admin.uds.dev
+            code: 200
+      - description: Validate NeuVector Scanner
+        wait:
+          cluster:
+            kind: Deployment
+            name: neuvector-scanner-pod
+            condition: Available
+            namespace: neuvector
 
   - name: ingress
     actions:
-      - description: #TEMPLATE_APPLICATION_DISPLAY_NAME# UI Status Check
+      - description: NeuVector UI Status Check
         maxRetries: 30
         cmd: |
-          STATUS=$(curl -L -o /dev/null -s -w "%{http_code}\n" https://#TEMPLATE_APPLICATION_NAME#.uds.dev)
-          echo "#TEMPLATE_APPLICATION_DISPLAY_NAME# system status: ${STATUS}"
+          STATUS=$(curl -L -o /dev/null -s -w "%{http_code}\n" https://neuvector.admin.uds.dev)
+          echo "NeuVector system status: ${STATUS}"
           if [ "$STATUS" != "200" ]; then
             sleep 10
             exit 1
           fi
 
-  - name: ui
-    description: #TEMPLATE_APPLICATION_DISPLAY_NAME# UI Checks
+  - name: e2e
+    description: Run NeuVector E2E Tests
     actions:
-      - cmd: |
-          docker run --user="$(id -u)" --rm --ipc=host --net=host --mount type=bind,source="$(pwd)",target=/app mcr.microsoft.com/playwright:v1.55.0-jammy sh -c " \
-            export npm_config_cache=/tmp/.npm && \
+      - description: NeuVector UI Checks
+        cmd: |
+          # renovate: datasource=docker depName=mcr.microsoft.com/playwright versioning=docker
+          docker run --rm --ipc=host --net=host --mount type=bind,source="$(pwd)",target=/app mcr.microsoft.com/playwright:v1.55.0-noble sh -c " \
             cd app && \
             npm ci && \
             npx playwright test \
             "
         dir: tests
+      - description: Trigger updater job and wait for all job completion
+        cmd: |
+          kubectl delete job updater -n neuvector >/dev/null 2>&1 || true # Clean up previous runs if necessary
+          kubectl create job --from=cronjob/neuvector-updater-pod updater -n neuvector
+          if ./uds zarf tools kubectl get jobs -n neuvector --no-headers 2>/dev/null | grep -q .; then
+            ./uds zarf tools kubectl wait --for=condition=complete job --all -n neuvector --timeout=5m
+          fi
