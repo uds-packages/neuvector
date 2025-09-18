@@ -3,11 +3,11 @@
 
 flavors:
   - name: upstream
-    # renovate-uds: datasource=docker depName=docker.io/neuvector/controller
+    # renovate-uds: datasource=docker versioning=docker depName=docker.io/neuvector/controller
     version: 5.4.6-uds.0
   - name: registry1
-    # renovate-uds: datasource=docker depName=registry1.dso.mil/ironbank/neuvector/neuvector/controller
+    # renovate-uds: datasource=docker versioning=docker depName=registry1.dso.mil/ironbank/neuvector/neuvector/controller
     version: 5.4.6-uds.0
   - name: unicorn
-    # renovate-uds: datasource=docker depName=quay.io/rfcurated/neuvector/controller
+    # renovate-uds: datasource=docker versioning=docker depName=quay.io/rfcurated/neuvector/controller
     version: 5.4.6-uds.0
