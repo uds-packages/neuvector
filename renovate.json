@@ -7,7 +7,7 @@
     "replacements:all",
     "workarounds:all"
   ],
-  "schedule": ["after 7am and before 9am every weekday"],
+  "schedule": ["* 7-8 * * 2"],
   "packageRules": [
     {
       "groupName": "NeuVector Support Dependencies",
