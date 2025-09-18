@@ -4,7 +4,7 @@
 flavors:
   - name: upstream
     # renovate-uds: datasource=docker depName=docker.io/neuvector/controller
-    version: 5.4.6-uds.0
+    version: 8241.2-uds.0
   - name: registry1
     # renovate-uds: datasource=docker depName=registry1.dso.mil/ironbank/neuvector/neuvector/controller
     version: 5.4.6-uds.0
