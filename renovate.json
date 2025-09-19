@@ -7,23 +7,39 @@
     "replacements:all",
     "workarounds:all"
   ],
-  "schedule": ["* 7-8 * * 2"],
+  "schedule": [
+    "* 7-8 * * 2"
+  ],
   "helm-values": {
-    "ignorePaths": ["values"]
+    "ignorePaths": [
+      "values"
+    ]
   },
   "packageRules": [
     {
       "groupName": "NeuVector Support Dependencies",
-      "labels": ["support-deps"],
+      "labels": [
+        "support-deps"
+      ],
       "commitMessageTopic": "support-deps",
-      "packagePatterns": ["*"]
+      "matchPackageNames": [
+        "*"
+      ]
     },
     {
       "groupName": "NeuVector Package Dependencies",
-      "labels": ["package-deps"],
+      "labels": [
+        "package-deps"
+      ],
       "commitMessageTopic": "package-deps",
-      "matchPackageNames": ["!/^mcr\\.microsoft\\.com\\/playwright$/"],
-      "matchDatasources": ["docker", "helm", "git-tags"]
+      "matchPackageNames": [
+        "!/^mcr\\.microsoft\\.com\\/playwright$/"
+      ],
+      "matchDatasources": [
+        "docker",
+        "helm",
+        "git-tags"
+      ]
     }
   ]
 }
