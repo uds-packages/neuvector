@@ -9,5 +9,5 @@ flavors:
     # renovate-uds: datasource=docker depName=registry1.dso.mil/ironbank/neuvector/neuvector/controller versioning=docker
     version: 5.4.6-uds.0
   - name: unicorn
-    # renovate-uds: datasource=docker depName=quay.io/rfcurated/neuvector/controller versioning=docker
+    # renovate-uds: datasource=docker depName=quay.io/rfcurated/neuvector/controller versioning=docker extractVersion=^v(?<version>\d+\.\d+\.\d+)$
     version: 5.4.6-uds.0
