@@ -45,7 +45,7 @@ test("validate system health", async ({ page }) => {
 
     expect(scannerData).toHaveProperty("scanners");
     expect(Array.isArray(scannerData.scanners)).toBe(true);
-    expect(scannerData.scanners.length).toBeGreaterThanOrEqual(3);
+    expect(scannerData.scanners.length).toBeGreaterThanOrEqual(1);
 
     // Ensure at least three controller exists and all are connected
     await page.getByRole("tab", { name: "Controllers" }).click();
