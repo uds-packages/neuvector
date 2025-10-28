@@ -14,7 +14,7 @@ export const authFile = `${playwrightDir}/auth/user.json`;
 export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI, // fail CI if you accidentally leave `test.only` in source
-  retries: 1,
+  retries: 2, // NeuVector can be slow clustering on install and does not have great healthprobes
   workers: 20, // Support up to 20 parallel workers
   timeout: 45000, // 45 second timeout for tests
   reporter: [
