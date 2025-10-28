@@ -24,13 +24,10 @@ jobs:
       matrix:
         flavor: [upstream, registry1, unicorn]
         architecture: [amd64, arm64]
-        exclude:
-          - flavor: registry1
-            architecture: arm64
     uses: defenseunicorns/uds-common/.github/workflows/callable-publish.yaml@4f46bb2110abc2c994ad242b099822de71de1ecc # v1.20.5
     with:
       flavor: ${{ matrix.flavor }}
       options: --set BASE_REPO="ghcr.io/uds-packages"
-      runsOn: ${{ matrix.architecture == 'arm64' && 'appstore-8-core-arm64' || 'appstore-8-core-amd64' }}
+      runsOn: ${{ matrix.architecture == 'arm64' && 'appstore-4-core-arm64' || 'appstore-4-core-amd64' }}
       uds-releaser: true
     secrets: inherit # Inherits all secrets from the parent workflow.
