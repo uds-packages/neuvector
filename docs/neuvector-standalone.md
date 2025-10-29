@@ -2,7 +2,7 @@
 
 This guide explains how to deploy NeuVector as a standalone package alongside UDS Core. It covers fresh installs, upgrades from existing Core deployments, and running NeuVector together with Falco.
 
-## 1. Fresh install alongside Core (no Falco)
+## Fresh install alongside Core (no Falco)
 Use this path when you want NeuVector and do not want Falco.
 
 1. Build your bundle using functional layers and omit the `core-runtime-security` package.
@@ -35,7 +35,7 @@ Use this path when you want NeuVector and do not want Falco.
        repository: ghcr.io/uds-packages/neuvector
        ref: <neuvector-version>
    ```
-2. Build and deploy your bundle. Examples:
+1. Build and deploy your bundle. Examples:
    - Build from a bundle directory (produces a .tar.zst artifact):
      ```bash
      # Example: build a bundle at bundles/my-env
@@ -46,63 +46,57 @@ Use this path when you want NeuVector and do not want Falco.
      # Generic artifact path pattern shown; adjust to your bundle name/version
      uds deploy bundles/my-env/uds-bundle-<name>-<arch>-<version>.tar.zst --confirm --no-progress
      ```
-3. Validate NeuVector is healthy (namespace, pods, UI, policies).
+1. Validate NeuVector is healthy (namespace, pods, UI, policies).
 
-## 2. Upgrade existing Core and add standalone NeuVector
+## Upgrade existing Core and add standalone NeuVector
 Use this path when upgrading from a Core version that previously managed NeuVector or when you are switching from Falco-only to NeuVector.
 
-1. When upgrading from a Core version that managed Neuvector and not deploying Falco, remove legacy Core‑managed NeuVector resources to avoid Helm ownership conflicts:
-   ```bash
-   kubectl delete namespace neuvector --ignore-not-found
-   kubectl get crd -o name | grep -i neuvector | xargs -r kubectl delete
-   ```
-2. Upgrade UDS Core and omit `core-runtime-security`
+1. Upgrade UDS Core
   - Deploy the standalone NeuVector package either via bundle (see fresh install bundle example)
   - Or directly with zarf:
     ```bash
     # Example direct install (adjust ref/registry as needed)
     zarf package deploy oci://ghcr.io/uds-packages/neuvector:<neuvector-version>
     ```
-4. Validate NeuVector workloads, UI availability, alert forwarding, and policies.
+1. Validate NeuVector workloads, UI availability, alert forwarding, and policies.
 
-## 3. Running NeuVector together with Falco
+## Running NeuVector together with Falco
 Running both is permitted. If you choose to run both:
 
 1. Keep `core-runtime-security` (Falco) in your Core deployment and do NOT enable the Falco cleanup gate.
-  ```yaml
-   kind: UDSBundle
-   metadata:
-     name: my-uds-bundle
-     description: Core with standalone NeuVector (no Falco)
-     version: 0.1.0
+    ```yaml
+    kind: UDSBundle
+    metadata:
+      name: my-uds-bundle
+      description: Core with standalone NeuVector (no Falco)
+      version: 0.1.0
 
-   packages:
-    - name: core-base
-      repository: ghcr.io/defenseunicorns/packages/uds/core-base
-      ref: <uds-core-version>
-      overrides:
-        pepr-uds-core:
-          module:
-            values:
-              - path: additionalIgnoredNamespaces
-                value:
-                  - uds-dev-stack
+    packages:
+      - name: core-base
+        repository: ghcr.io/defenseunicorns/packages/uds/core-base
+        ref: <uds-core-version>
+        overrides:
+          pepr-uds-core:
+            module:
+              values:
+                - path: additionalIgnoredNamespaces
+                  value:
+                    - uds-dev-stack
 
-    - name: core-identity-authorization
-      repository: ghcr.io/defenseunicorns/packages/uds/core-identity-authorization
-      ref: <uds-core-version>
+      - name: core-identity-authorization
+        repository: ghcr.io/defenseunicorns/packages/uds/core-identity-authorization
+        ref: <uds-core-version>
 
-    - name: core-runtime-security
-      repository: ghcr.io/defenseunicorns/packages/uds/core-runtime-security
-      ref: <uds-core-version>
+      - name: core-runtime-security
+        repository: ghcr.io/defenseunicorns/packages/uds/core-runtime-security
+        ref: <uds-core-version>
 
-     - name: neuvector
-       repository: ghcr.io/uds-packages/neuvector
-       ref: <neuvector-version>
-  ```
-2. Upgrade only: If any legacy Core‑managed NeuVector resources exist, clean them up before installing the standalone package (namespace and CRDs as shown above) to avoid ownership/permission conflicts.
-3. Deploy the standalone NeuVector package (bundle or direct) and validate.
-4. Review policies, ports, and alerting destinations to avoid duplicate events and noise.
+      - name: neuvector
+        repository: ghcr.io/uds-packages/neuvector
+        ref: <neuvector-version>
+    ```
+1. Deploy the standalone NeuVector package (bundle or direct) and validate.
+1. Review policies, ports, and alerting destinations to avoid duplicate events and noise.
 
 ## Networking example (optional)
 If NeuVector needs to send alerts to an external destination or an in‑cluster service, add network rules in the NeuVector package values using the UDS Package `allow` constructs. Example pattern:
