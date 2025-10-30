@@ -42,14 +42,14 @@ It may be desired send alerts from NeuVector to locations in or outside of the c
   neuvector:
     uds-neuvector-config:
       values:
-        - path: additionalNetworkAllow
-          value:
-            - direction: Egress
-              selector:
-                app: neuvector-manager-pod
-              remoteGenerated: Anywhere
-              description: "from neuvector to anywhere"
-              port: 443
+        - direction: Egress
+          selector:
+            app: neuvector-manager-pod
+            ports:
+              - 443
+            remoteHost: your.remotehost.com # set to the hostname where you want to send events
+            remoteProtocol: TLS
+            description: "Allow egress Neuvector to your.remotehost.com" # update description as needed
 ```
 
 The example above allows NeuVector to send alerts to any external destination. Alternatively, you could use the remoteNamespace key to specify another namespace within the Kubernetes cluster (i.e. Mattermost).
