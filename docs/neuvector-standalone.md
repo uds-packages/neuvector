@@ -32,7 +32,7 @@ Use this path when you want NeuVector and do not want Falco.
      # Intentionally omit 'core-runtime-security'
 
      - name: neuvector
-       repository: ghcr.io/uds-packages/neuvector
+       repository: oci://registry.defenseunicorns.com/public/neuvector # Registry requires authentication to pull, alternatively use ghcr.io/uds-packages/neuvector
        ref: <neuvector-version>
 
     # Include other functional layers here (logging, monitoring, etc)
@@ -50,8 +50,8 @@ Use this path when you want NeuVector and do not want Falco.
      ```
 1. Alternatively, create a Zarf package and deploy that package individually:
     ```bash
-    # Example direct install (adjust ref/registry as needed)
-    zarf package deploy oci://ghcr.io/uds-packages/neuvector:<neuvector-version>
+    # Example direct install (adjust ref/registry as needed); Registry requires authentication to pull, alternatively use ghcr.io/uds-packages/neuvector
+    zarf package deploy oci://registry.defenseunicorns.com/public/neuvector:<neuvector-version>
     ```
 1. Validate NeuVector is healthy (namespace, pods, UI, policies).
 
@@ -72,7 +72,7 @@ Running both is permitted. If you choose to run both:
         ref: <uds-core-version>
 
       - name: neuvector
-        repository: ghcr.io/uds-packages/neuvector
+        repository: oci://registry.defenseunicorns.com/public/neuvector # Registry requires authentication to pull, alternatively use ghcr.io/uds-packages/neuvector
         ref: <neuvector-version>
     ```
 1. Deploy the standalone NeuVector package (bundle or direct) and validate.

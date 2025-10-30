@@ -52,4 +52,4 @@ It may be desired send alerts from NeuVector to locations in or outside of the c
             description: "Allow egress Neuvector to your.remotehost.com" # update description as needed
 ```
 
-The example above allows NeuVector to send alerts to any external destination. Alternatively, you could use the remoteNamespace key to specify another namespace within the Kubernetes cluster (i.e. Mattermost).
+The example above allows NeuVector to send alerts to your specific remote host alerting destination. Alternatively, you could use the remoteNamespace key to specify another namespace within the Kubernetes cluster (i.e. Mattermost) or a remoteCidr.
