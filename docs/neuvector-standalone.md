@@ -32,7 +32,7 @@ Use this path when you want NeuVector and do not want Falco.
      # Intentionally omit 'core-runtime-security'
 
      - name: neuvector
-       repository: oci://registry.defenseunicorns.com/public/neuvector # Registry requires authentication to pull, alternatively use ghcr.io/uds-packages/neuvector
+       repository: registry.defenseunicorns.com/public/neuvector # Registry requires authentication to pull, alternatively use ghcr.io/uds-packages/neuvector
        ref: <neuvector-version>
 
     # Include other functional layers here (logging, monitoring, etc)
@@ -72,7 +72,7 @@ Running both is permitted. If you choose to run both:
         ref: <uds-core-version>
 
       - name: neuvector
-        repository: oci://registry.defenseunicorns.com/public/neuvector # Registry requires authentication to pull, alternatively use ghcr.io/uds-packages/neuvector
+        repository: registry.defenseunicorns.com/public/neuvector # Registry requires authentication to pull, alternatively use ghcr.io/uds-packages/neuvector
         ref: <neuvector-version>
     ```
 1. Deploy the standalone NeuVector package (bundle or direct) and validate.
