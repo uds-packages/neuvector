@@ -34,3 +34,22 @@ neuvector:
           value:
             - KEYCLOAK_AUDITOR_GROUP # name of an existing Keycloak group
 ```
+
+### External Alerts
+It may be desired send alerts from NeuVector to locations in or outside of the cluster. To facilitate this, you can provide a bundle override as follows:
+
+```yaml
+  neuvector:
+    uds-neuvector-config:
+      values:
+        - direction: Egress
+          selector:
+            app: neuvector-manager-pod
+            ports:
+              - 443
+            remoteHost: your.remotehost.com # set to the hostname where you want to send events
+            remoteProtocol: TLS
+            description: "Allow egress Neuvector to your.remotehost.com" # update description as needed
+```
+
+The example above allows NeuVector to send alerts to your specific remote host alerting destination. Alternatively, you could use the remoteNamespace key to specify another namespace within the Kubernetes cluster (i.e. Mattermost) or a remoteCidr.
