@@ -55,7 +55,7 @@ components:
     images:
       - registry1.dso.mil/ironbank/neuvector/neuvector/controller:5.4.7
       - registry1.dso.mil/ironbank/neuvector/neuvector/manager:5.4.7
-      - registry1.dso.mil/ironbank/redhat/ubi/ubi9-minimal:9.6
+      - registry1.dso.mil/ironbank/redhat/ubi/ubi9-minimal:9.7
       - registry1.dso.mil/ironbank/neuvector/neuvector/scanner:6
       - registry1.dso.mil/ironbank/neuvector/neuvector/enforcer:5.4.7
 
@@ -74,5 +74,5 @@ components:
       - quay.io/rfcurated/neuvector/controller:5.4.7-jammy-scratch-fips-rfcurated
       - quay.io/rfcurated/neuvector/manager:5.4.7-jammy-scratch-fips-rfcurated
       - quay.io/rfcurated/neuvector/enforcer:5.4.7-jammy-scratch-fips-rfcurated
-      - quay.io/rfcurated/curl:8.16.0-jammy-scratch-fips-rfcurated
+      - quay.io/rfcurated/curl:8.17.0-jammy-scratch-fips-rfcurated
       - quay.io/rfcurated/neuvector/scanner:latest-jammy-scratch-fips-rfcurated
