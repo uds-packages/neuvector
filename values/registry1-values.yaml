@@ -35,4 +35,4 @@ cve:
     image:
       repository: ironbank/redhat/ubi/ubi9-minimal
       # renovate: datasource=docker depName=registry1.dso.mil/ironbank/redhat/ubi/ubi9-minimal versioning=docker
-      tag: "9.6"
+      tag: "9.7"
