@@ -26,10 +26,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       - name: test-flavor
-        uses: defenseunicorns/uds-common/.github/actions/test-flavor@c12c3d15f2655420ae2be8da400daae0919f6f3d # v1.21.3
+        uses: defenseunicorns/uds-common/.github/actions/test-flavor@fd0cab3563f7d70ea20850c81c2bbdf30c5fcd6b # v1.21.4
         id: test-flavor
     outputs:
       upgrade-flavors: ${{ steps.test-flavor.outputs.upgrade-flavors }}
@@ -41,7 +41,7 @@ jobs:
       matrix:
         type: [install, upgrade]
         flavor: [upstream, unicorn, registry1]
-    uses: defenseunicorns/uds-common/.github/workflows/callable-test.yaml@c12c3d15f2655420ae2be8da400daae0919f6f3d # v1.21.3
+    uses: defenseunicorns/uds-common/.github/workflows/callable-test.yaml@fd0cab3563f7d70ea20850c81c2bbdf30c5fcd6b # v1.21.4
     with:
       timeout: 30
       options: --set BASE_REPO="ghcr.io/uds-packages"
