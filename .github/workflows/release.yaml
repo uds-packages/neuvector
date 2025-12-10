@@ -24,7 +24,7 @@ jobs:
       matrix:
         flavor: [upstream, registry1, unicorn]
         architecture: [amd64, arm64]
-    uses: defenseunicorns/uds-common/.github/workflows/callable-publish.yaml@fd0cab3563f7d70ea20850c81c2bbdf30c5fcd6b # v1.21.4
+    uses: defenseunicorns/uds-common/.github/workflows/callable-publish.yaml@0727b33c41023f2d382b6d4680bc306bd6ca25c7 # v1.21.5
     with:
       flavor: ${{ matrix.flavor }}
       options: --set BASE_REPO="ghcr.io/uds-packages"
