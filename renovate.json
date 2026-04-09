@@ -40,6 +40,17 @@
         "helm",
         "git-tags"
       ]
+    },
+    {
+      "matchPackageNames": [
+        "registry1.dso.mil/ironbank/neuvector/neuvector/scanner"
+      ],
+      "followTag": "6",
+      "pinDigests": true,
+      "commitMessageTopic": "neuvector/scanner CVE DB digest",
+      "labels": [
+        "package-deps"
+      ]
     }
   ]
 }
