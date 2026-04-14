@@ -19,7 +19,7 @@ test("validate system health", async ({ page }) => {
     await eulaPromise;
 
     await expect(page.getByRole("button", { name: "Login with OpenID" })).toBeVisible();
-    const termsCheckbox = await page.locator(".mat-checkbox-inner-container");
+    const termsCheckbox = page.getByRole("checkbox");
     if (await termsCheckbox.isVisible()) {
       await termsCheckbox.click();
     }
@@ -98,7 +98,7 @@ test("validate local login is blocked", async ({ page }) => {
     await page.waitForLoadState("domcontentloaded");
     await eulaPromise;
 
-    const termsCheckbox = await page.locator(".mat-checkbox-inner-container");
+    const termsCheckbox = page.getByRole("checkbox");
     if (await termsCheckbox.isVisible()) {
       await termsCheckbox.click();
     }
