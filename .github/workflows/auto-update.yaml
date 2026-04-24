@@ -1,0 +1,37 @@
+# Copyright 2026 Defense Unicorns
+# SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-Defense-Unicorns-Commercial
+
+name: Auto Update
+# Uses callable-auto-update from uds-common to scan the sboms in the package, grab the
+# image digests, and compare to the current upstream image digests of the same tag. If
+# the digests don't match in any image, then bump the uds version to trigger
+# a new release.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: Enable dry-run mode, which doesn't commit changes to the repository.
+        required: false
+        default: false
+        type: boolean
+  schedule:
+    - cron: 0 14 * * 1 # weekly Monday at 2 PM UTC
+
+# Permissions for the GITHUB_TOKEN used by the workflow.
+permissions:
+  contents: write # Allows writing content to the repository.
+  packages: read # Allows reading the content of the repository's packages.
+  pull-requests: write # Allows creating or updating pull requests.
+
+# Abort prior jobs in the same workflow / PR
+concurrency:
+  group: auto-update-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  auto-update:
+    uses: defenseunicorns/uds-common/.github/workflows/callable-auto-update.yaml@1614a9f51fbf1f21e7a28020702773d9bdefd8fe # v1.24.5
+    with:
+      dry-run: ${{ inputs.dry-run || false }}
+    secrets: inherit # Inherits all secrets from the parent workflow.
