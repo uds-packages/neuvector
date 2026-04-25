@@ -19,10 +19,10 @@ cve:
   scanner:
     image:
       repository: neuvector/scanner
-      tag: latest
+      tag: "6"
 
   updater:
     enabled: true
     image:
       repository: neuvector/updater
-      tag: latest
+      tag: "0.0.10"
