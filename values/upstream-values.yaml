@@ -20,6 +20,13 @@ cve:
     image:
       repository: neuvector/scanner
       tag: "6"
+    volumes:
+      - name: internal-cert-dir
+        emptyDir:
+          sizeLimit: 50Mi
+    volumeMounts:
+      - mountPath: /etc/neuvector/certs/internal/
+        name: internal-cert-dir
 
   updater:
     enabled: true
