@@ -37,8 +37,8 @@ components:
     images:
       - docker.io/neuvector/controller:5.5.0
       - docker.io/neuvector/manager:5.5.0
-      - docker.io/neuvector/updater:latest
-      - docker.io/neuvector/scanner:latest
+      - docker.io/neuvector/updater:0.0.10
+      - docker.io/neuvector/scanner:6
       - docker.io/neuvector/enforcer:5.5.0
 
   - name: neuvector
