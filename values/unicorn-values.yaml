@@ -23,9 +23,10 @@ controller:
 cve:
   scanner:
     image:
-      registry: docker.io
-      repository: neuvector/scanner
-      tag: "6"
+      registry: cgr.dev
+      repository: defenseunicorns.com/neuvector-scanner-fips
+      # renovate: datasource=docker depName=cgr.dev/defenseunicorns.com/neuvector-scanner-fips versioning=docker
+      tag: "v4.170"
     volumes:
       - name: internal-cert-dir
         emptyDir:
