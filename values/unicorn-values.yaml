@@ -31,9 +31,18 @@ cve:
       - name: internal-cert-dir
         emptyDir:
           sizeLimit: 50Mi
+      # CGR image runs as non-root and cannot write to /tmp; emptyDirs provide writable scratch space
+      - name: tmp-images
+        emptyDir: {}
+      - name: tmp-neuvector
+        emptyDir: {}
     volumeMounts:
       - mountPath: /etc/neuvector/certs/internal/
         name: internal-cert-dir
+      - mountPath: /tmp/images
+        name: tmp-images
+      - mountPath: /tmp/neuvector
+        name: tmp-neuvector
   updater:
     enabled: true
     image:
