@@ -75,4 +75,5 @@ components:
       - cgr.dev/defenseunicorns.com/neuvector-manager:5.5.1
       - cgr.dev/defenseunicorns.com/neuvector-enforcer-fips:5.5.1
       - cgr.dev/defenseunicorns.com/curl-fips:8.20.0-dev
-      - cgr.dev/defenseunicorns.com/neuvector-scanner-fips:v4.170
+      # v4 is Chainguard's equivalent of upstream's floating :6 tag, different scheme
+      - cgr.dev/defenseunicorns.com/neuvector-scanner-fips:v4

@@ -25,8 +25,7 @@ cve:
     image:
       registry: cgr.dev
       repository: defenseunicorns.com/neuvector-scanner-fips
-      # renovate: datasource=docker depName=cgr.dev/defenseunicorns.com/neuvector-scanner-fips versioning=docker
-      tag: "v4.170"
+      tag: "v4"
     volumes:
       - name: internal-cert-dir
         emptyDir:
