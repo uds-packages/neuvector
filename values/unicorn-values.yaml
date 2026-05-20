@@ -4,27 +4,28 @@
 # Generate certs missing from unicorn images
 autoGenerateCert: true
 
-registry: quay.io
-# renovate: datasource=docker depName=quay.io/rfcurated/neuvector/controller versioning=docker
-tag: 5.5.1-jammy-scratch-fips-rfcurated
+registry: cgr.dev
+# renovate: datasource=docker depName=cgr.dev/defenseunicorns.com/neuvector-controller-fips versioning=docker
+tag: "5.5.1"
 
 manager:
   image:
-    repository: rfcurated/neuvector/manager
+    repository: defenseunicorns.com/neuvector-manager
 
 enforcer:
   image:
-    repository: rfcurated/neuvector/enforcer
+    repository: defenseunicorns.com/neuvector-enforcer-fips
 
 controller:
   image:
-    repository: rfcurated/neuvector/controller
+    repository: defenseunicorns.com/neuvector-controller-fips
 
 cve:
   scanner:
     image:
-      repository: rfcurated/neuvector/scanner
-      tag: latest-jammy-scratch-fips-rfcurated
+      registry: docker.io
+      repository: neuvector/scanner
+      tag: "6"
     volumes:
       - name: internal-cert-dir
         emptyDir:
@@ -35,6 +36,6 @@ cve:
   updater:
     enabled: true
     image:
-      repository: rfcurated/curl
-      # renovate: datasource=docker depName=quay.io/rfcurated/curl versioning=docker
-      tag: 8.20.0-jammy-scratch-fips-rfcurated
+      repository: defenseunicorns.com/curl-fips
+      # renovate: datasource=docker depName=cgr.dev/defenseunicorns.com/curl-fips versioning=docker
+      tag: "8.20.0-dev"
