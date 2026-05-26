@@ -4,37 +4,47 @@
 # Generate certs missing from unicorn images
 autoGenerateCert: true
 
-registry: quay.io
-# renovate: datasource=docker depName=quay.io/rfcurated/neuvector/controller versioning=docker
-tag: 5.5.1-jammy-scratch-fips-rfcurated
+registry: cgr.dev
+# renovate: datasource=docker depName=cgr.dev/defenseunicorns.com/neuvector-controller-fips versioning=docker
+tag: "5.5.1"
 
 manager:
   image:
-    repository: rfcurated/neuvector/manager
+    repository: defenseunicorns.com/neuvector-manager
 
 enforcer:
   image:
-    repository: rfcurated/neuvector/enforcer
+    repository: defenseunicorns.com/neuvector-enforcer-fips
 
 controller:
   image:
-    repository: rfcurated/neuvector/controller
+    repository: defenseunicorns.com/neuvector-controller-fips
 
 cve:
   scanner:
     image:
-      repository: rfcurated/neuvector/scanner
-      tag: latest-jammy-scratch-fips-rfcurated
+      registry: cgr.dev
+      repository: defenseunicorns.com/neuvector-scanner-fips
+      tag: "v4"
     volumes:
       - name: internal-cert-dir
         emptyDir:
           sizeLimit: 50Mi
+      # CGR image runs as non-root and cannot write to /tmp; emptyDirs provide writable scratch space
+      - name: tmp-images
+        emptyDir: {}
+      - name: tmp-neuvector
+        emptyDir: {}
     volumeMounts:
       - mountPath: /etc/neuvector/certs/internal/
         name: internal-cert-dir
+      - mountPath: /tmp/images
+        name: tmp-images
+      - mountPath: /tmp/neuvector
+        name: tmp-neuvector
   updater:
     enabled: true
     image:
-      repository: rfcurated/curl
-      # renovate: datasource=docker depName=quay.io/rfcurated/curl versioning=docker
-      tag: 8.20.0-jammy-scratch-fips-rfcurated
+      repository: defenseunicorns.com/curl-fips
+      # renovate: datasource=docker depName=cgr.dev/defenseunicorns.com/curl-fips versioning=docker
+      tag: "8.20.0-dev"
