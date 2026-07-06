@@ -1,5 +1,5 @@
 /**
- * Copyright 2025 Defense Unicorns
+ * Copyright 2025-2026 Defense Unicorns
  * SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-Defense-Unicorns-Commercial
  */
 
@@ -79,15 +79,23 @@ test("validate system health", async ({ page }) => {
   });
 
   await test.step("check scanning functionality", async () => {
-    await page.goto("/#/workloads");
-    await page.waitForLoadState("domcontentloaded");
+    const scannedWorkloadsResponse = await page.evaluate(async requestUrl => {
+      const storedToken = localStorage.getItem("token");
+      const token = storedToken ? (JSON.parse(storedToken) as { token?: { token?: string } }).token?.token : undefined;
+      const response = await fetch(requestUrl, {
+        headers: token ? { token } : undefined,
+      });
+      const body = await response.text();
+      const scannedWorkloads = response.ok ? JSON.parse(body) as unknown[] : [];
 
-    // Pick the first istio-proxy image to scan
-    await page.getByText("istio-proxy").first().click();
-    const scannerPromise = page.waitForResponse(`${url}/workload/scanned*`);
-    await page.getByRole("button", { name: "Scan action" }).click();
-    const scannerResponse = await scannerPromise;
-    expect(scannerResponse.status()).toBe(200);
+      return {
+        status: response.status,
+        body,
+        count: scannedWorkloads.length,
+      };
+    }, `${url}/workload/scanned?start=0&limit=10` satisfies string);
+    expect(scannedWorkloadsResponse.status, scannedWorkloadsResponse.body).toBe(200);
+    expect(scannedWorkloadsResponse.count).toBeGreaterThan(0);
   });
 });
 

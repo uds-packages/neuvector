@@ -12,4 +12,4 @@ on:
 
 jobs:
   run:
-    uses: defenseunicorns/uds-common/.github/workflows/callable-commitlint.yaml@86fcadc2845a318761276a8754e47e33c0d6ae31 # v1.24.10
+    uses: defenseunicorns/uds-common/.github/workflows/callable-commitlint.yaml@3a225748bd88edb257a3e827f40b22167fe75412 # v1.26.1
