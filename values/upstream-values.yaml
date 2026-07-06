@@ -32,4 +32,5 @@ cve:
     enabled: true
     image:
       repository: neuvector/updater
-      tag: "0.0.10"
+      # renovate: datasource=docker depName=docker.io/neuvector/updater versioning=docker
+      tag: "0.0.12"
