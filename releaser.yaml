@@ -1,4 +1,4 @@
-# Copyright 2025 Defense Unicorns
+# Copyright 2025-2026 Defense Unicorns
 # SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-Defense-Unicorns-Commercial
 
 flavors:
@@ -9,5 +9,5 @@ flavors:
     # renovate-uds: datasource=docker depName=registry1.dso.mil/ironbank/neuvector/neuvector/controller versioning=docker
     version: 5.5.3-uds.0
   - name: unicorn
-    # renovate-uds: datasource=docker depName=cgr.dev/defenseunicorns.com/neuvector-controller-fips versioning=docker
-    version: v5.5.3-uds.0
+    # renovate-uds: datasource=docker depName=cgr.dev/defenseunicorns.com/neuvector-controller-fips versioning=docker extractVersion=^v(?<version>.*)$
+    version: 5.5.3-uds.0
