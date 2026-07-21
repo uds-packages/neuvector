@@ -4,10 +4,10 @@
 flavors:
   - name: upstream
     # renovate-uds: datasource=docker depName=docker.io/neuvector/controller versioning=docker
-    version: 5.5.3-uds.1
+    version: 5.6.0-uds.0
   - name: registry1
     # renovate-uds: datasource=docker depName=registry1.dso.mil/ironbank/neuvector/neuvector/controller versioning=docker
-    version: 5.5.3-uds.1
+    version: 5.6.0-uds.0
   - name: unicorn
     # renovate-uds: datasource=docker depName=cgr.dev/defenseunicorns.com/neuvector-controller-fips versioning=docker extractVersion=^v(?<version>.*)$
-    version: 5.5.3-uds.2
+    version: 5.6.0-uds.0
