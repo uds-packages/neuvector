@@ -26,7 +26,13 @@ test("validate system health", async ({ page }) => {
     const openIdPromise = page.waitForResponse(res => res.url().startsWith(`${url}/openId_auth`));
     await page.getByRole("button", { name: "Login with OpenID" }).click();
     await openIdPromise;
-    await expect(page).toHaveURL("/#/dashboard", { timeout: FIFTEEN_SECONDS });
+    await expect(page).toHaveURL(
+      currentUrl =>
+        currentUrl.origin === url &&
+        ["/", "/index.html"].includes(currentUrl.pathname) &&
+        currentUrl.hash === "#/dashboard",
+      { timeout: FIFTEEN_SECONDS },
+    );
     await expect(page.locator(".navbar-header")).toBeVisible({ timeout: FIFTEEN_SECONDS });
   });
 
