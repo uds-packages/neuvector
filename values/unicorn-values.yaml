@@ -6,7 +6,7 @@ autoGenerateCert: true
 
 registry: cgr.dev
 # renovate: datasource=docker depName=cgr.dev/defenseunicorns.com/neuvector-controller-fips versioning=docker
-tag: "v5.5.3"
+tag: "v5.6.0"
 
 manager:
   image:
