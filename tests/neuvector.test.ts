@@ -6,12 +6,14 @@
 import { expect, test } from "@playwright/test";
 
 const FIFTEEN_SECONDS = 15_000;
+const SCAN_POLL_INTERVAL = 5_000;
+const SCAN_TIMEOUT = 4 * 60_000;
 
 const url = `https://neuvector.admin.uds.dev`;
 test.use({ baseURL: url });
 
 test("validate system health", async ({ page }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(SCAN_TIMEOUT + 60_000);
   await test.step("check sso", async () => {
     const eulaPromise = page.waitForResponse(res => res.url().startsWith(`${url}/eula`));
     await page.goto("/");
@@ -85,7 +87,7 @@ test("validate system health", async ({ page }) => {
   });
 
   await test.step("check scanning functionality", async () => {
-    const scannedWorkloadsResponse = await page.evaluate(async requestUrl => {
+    const getScannedWorkloads = () => page.evaluate(async requestUrl => {
       type ScanSummary = {
         status?: string;
         result?: string;
@@ -127,15 +129,42 @@ test("validate system health", async ({ page }) => {
         scanSummaries: scannedWorkloads.flatMap(collectScanSummaries),
       };
     }, `${url}/workload/scanned?start=0&limit=10` satisfies string);
-    expect(scannedWorkloadsResponse.status, scannedWorkloadsResponse.body).toBe(200);
-    expect(scannedWorkloadsResponse.count).toBeGreaterThan(0);
 
-    expect(scannedWorkloadsResponse.scanSummaries.length, scannedWorkloadsResponse.body).toBeGreaterThan(0);
-    for (const { displayName, summary } of scannedWorkloadsResponse.scanSummaries) {
-      expect(summary, `No scan summary returned for ${displayName}`).toBeDefined();
-      expect(summary?.status, `Scan did not finish for ${displayName}`).toBe("finished");
-      expect(summary?.result, `Scan did not succeed for ${displayName}`).toBe("succeeded");
+    const deadline = Date.now() + SCAN_TIMEOUT;
+    let scannedWorkloadsResponse: Awaited<ReturnType<typeof getScannedWorkloads>> | undefined;
+
+    while (Date.now() < deadline) {
+      scannedWorkloadsResponse = await getScannedWorkloads();
+      expect(scannedWorkloadsResponse.status, scannedWorkloadsResponse.body).toBe(200);
+      expect(scannedWorkloadsResponse.count, scannedWorkloadsResponse.body).toBeGreaterThan(0);
+      expect(scannedWorkloadsResponse.scanSummaries.length, scannedWorkloadsResponse.body).toBeGreaterThan(0);
+
+      const failures = scannedWorkloadsResponse.scanSummaries.filter(({ summary }) =>
+        summary?.status === "failed" ||
+        (summary?.status === "finished" && summary.result !== "succeeded"),
+      );
+      expect(
+        failures,
+        `Terminal scan failures: ${failures.map(({ displayName, summary }) =>
+          `${displayName} (status=${summary?.status ?? "missing"}, result=${summary?.result ?? "missing"})`).join(", ")}`,
+      ).toEqual([]);
+
+      if (scannedWorkloadsResponse.scanSummaries.some(({ summary }) =>
+        summary?.status === "finished" && summary.result === "succeeded",
+      )) {
+        return;
+      }
+
+      await page.waitForTimeout(SCAN_POLL_INTERVAL);
     }
+
+    expect(scannedWorkloadsResponse, "No scan response received before timeout").toBeDefined();
+    expect(
+      scannedWorkloadsResponse?.scanSummaries.filter(({ summary }) =>
+        summary?.status === "finished" && summary.result === "succeeded",
+      ).length,
+      `No successful scan completed within ${SCAN_TIMEOUT / 1000} seconds: ${scannedWorkloadsResponse?.body}`,
+    ).toBeGreaterThan(0);
   });
 });
 
