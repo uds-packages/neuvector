@@ -86,22 +86,56 @@ test("validate system health", async ({ page }) => {
 
   await test.step("check scanning functionality", async () => {
     const scannedWorkloadsResponse = await page.evaluate(async requestUrl => {
+      type ScanSummary = {
+        status?: string;
+        result?: string;
+      };
+
+      type ScannedWorkload = {
+        brief?: {
+          display_name?: string;
+        };
+        security?: {
+          scan_summary?: ScanSummary;
+        };
+        children?: ScannedWorkload[];
+      };
+
+      const collectScanSummaries = (workload: ScannedWorkload): Array<{
+        displayName: string;
+        summary?: ScanSummary;
+      }> => [
+        {
+          displayName: workload.brief?.display_name ?? "unknown workload",
+          summary: workload.security?.scan_summary,
+        },
+        ...(workload.children?.flatMap(collectScanSummaries) ?? []),
+      ];
+
       const storedToken = localStorage.getItem("token");
       const token = storedToken ? (JSON.parse(storedToken) as { token?: { token?: string } }).token?.token : undefined;
       const response = await fetch(requestUrl, {
         headers: token ? { token } : undefined,
       });
       const body = await response.text();
-      const scannedWorkloads = response.ok ? JSON.parse(body) as unknown[] : [];
+      const scannedWorkloads = response.ok ? JSON.parse(body) as ScannedWorkload[] : [];
 
       return {
         status: response.status,
         body,
         count: scannedWorkloads.length,
+        scanSummaries: scannedWorkloads.flatMap(collectScanSummaries),
       };
     }, `${url}/workload/scanned?start=0&limit=10` satisfies string);
     expect(scannedWorkloadsResponse.status, scannedWorkloadsResponse.body).toBe(200);
     expect(scannedWorkloadsResponse.count).toBeGreaterThan(0);
+
+    expect(scannedWorkloadsResponse.scanSummaries.length, scannedWorkloadsResponse.body).toBeGreaterThan(0);
+    for (const { displayName, summary } of scannedWorkloadsResponse.scanSummaries) {
+      expect(summary, `No scan summary returned for ${displayName}`).toBeDefined();
+      expect(summary?.status, `Scan did not finish for ${displayName}`).toBe("finished");
+      expect(summary?.result, `Scan did not succeed for ${displayName}`).toBe("succeeded");
+    }
   });
 });
 
