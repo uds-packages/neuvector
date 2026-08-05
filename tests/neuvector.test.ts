@@ -7,7 +7,7 @@ import { expect, test } from "@playwright/test";
 
 const FIFTEEN_SECONDS = 15_000;
 const SCAN_POLL_INTERVAL = 5_000;
-const SCAN_TIMEOUT = 4 * 60_000;
+const SCAN_TIMEOUT = 2 * 60_000;
 
 const url = `https://neuvector.admin.uds.dev`;
 test.use({ baseURL: url });
