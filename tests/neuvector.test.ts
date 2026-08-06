@@ -16,6 +16,7 @@ test.use({ baseURL: url });
 type ScanSummary = {
   status?: string;
   result?: string;
+  scanned_timestamp?: number;
 };
 
 type ScanSummaryEntry = {
@@ -249,6 +250,13 @@ test.describe("authenticated checks", () => {
         .map(({ workloadId }) => workloadId)
         .filter((workloadId): workloadId is string => Boolean(workloadId));
 
+      const initialScanTimestamps = new Map(
+        scanTargets.map(({ workloadId, summary }) => [
+          workloadId,
+          summary?.scanned_timestamp,
+        ])
+      );
+
       expect(
         scanTargetIds.length,
         initialScannedWorkloads.body
@@ -259,6 +267,19 @@ test.describe("authenticated checks", () => {
         `Failed to trigger scans: ${JSON.stringify(scanRequests)}`
       ).toEqual([]);
 
+      const observedScanProgress = new Set<string>();
+      const isFreshScan = (workloadId: string, summary?: ScanSummary) => {
+        const scannedTimestamp = summary?.scanned_timestamp;
+        const initialScannedTimestamp = initialScanTimestamps.get(workloadId);
+
+        return (
+          scannedTimestamp !== undefined &&
+          (initialScannedTimestamp === undefined
+            ? observedScanProgress.has(workloadId)
+            : scannedTimestamp > initialScannedTimestamp)
+        );
+      };
+
       while (Date.now() < deadline) {
         scannedWorkloadsResponse = await getScannedWorkloads();
         expect(
@@ -268,8 +289,20 @@ test.describe("authenticated checks", () => {
         const triggeredScans = scannedWorkloadsResponse.scanSummaries.filter(
           ({ workloadId }) => workloadId && scanTargetIds.includes(workloadId)
         );
+        triggeredScans.forEach(({ workloadId, summary }) => {
+          if (
+            workloadId &&
+            (summary?.status === "scheduled" || summary?.status === "scanning")
+          ) {
+            observedScanProgress.add(workloadId);
+          }
+        });
+        const freshTriggeredScans = triggeredScans.filter(
+          ({ workloadId, summary }) =>
+            workloadId !== undefined && isFreshScan(workloadId, summary)
+        );
 
-        const failures = triggeredScans.filter(
+        const failures = freshTriggeredScans.filter(
           ({ summary }) =>
             summary?.status === "failed" ||
             (summary?.status === "finished" && summary.result !== "succeeded")
@@ -287,8 +320,8 @@ test.describe("authenticated checks", () => {
         ).toEqual([]);
 
         if (
-          triggeredScans.length === scanTargetIds.length &&
-          triggeredScans.every(
+          freshTriggeredScans.length === scanTargetIds.length &&
+          freshTriggeredScans.every(
             ({ summary }) =>
               summary?.status === "finished" && summary.result === "succeeded"
           )
@@ -308,6 +341,7 @@ test.describe("authenticated checks", () => {
           ({ workloadId, summary }) =>
             workloadId &&
             scanTargetIds.includes(workloadId) &&
+            isFreshScan(workloadId, summary) &&
             summary?.status === "finished" &&
             summary.result === "succeeded"
         ).length,
