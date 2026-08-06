@@ -22,8 +22,10 @@ controller:
 
 cve:
   scanner:
+    # Chart does not expose full securityContext so we use UDS Policy labels to mutate it on
     podLabels:
-      uds/fsgroup: "1000"
+      uds/user: "65532"
+      uds/group: "65532"
     image:
       registry: cgr.dev
       repository: defenseunicorns.com/neuvector-scanner-fips
@@ -32,14 +34,9 @@ cve:
       - name: internal-cert-dir
         emptyDir:
           sizeLimit: 50Mi
-      # CGR image runs as non-root and cannot write to /tmp; emptyDirs provide writable scratch space.
-      - name: tmp
-        emptyDir: {}
     volumeMounts:
       - mountPath: /etc/neuvector/certs/internal/
         name: internal-cert-dir
-      - mountPath: /tmp
-        name: tmp
   updater:
     enabled: true
     image:
