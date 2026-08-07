@@ -10,4 +10,4 @@ flavors:
     version: 5.6.0-uds.0
   - name: unicorn
     # renovate-uds: datasource=docker depName=cgr.dev/defenseunicorns.com/neuvector-controller-fips versioning=docker extractVersion=^v(?<version>.*)$
-    version: 5.6.0-uds.0
+    version: 5.6.0-uds.1

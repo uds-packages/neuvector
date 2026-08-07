@@ -3,111 +3,361 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-Defense-Unicorns-Commercial
  */
 
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 const FIFTEEN_SECONDS = 15_000;
+const SCAN_POLL_INTERVAL = 5_000;
+const SCAN_TIMEOUT = 2 * 60_000;
+const MAX_SCAN_TARGETS = 5;
 
 const url = `https://neuvector.admin.uds.dev`;
 test.use({ baseURL: url });
 
-test("validate system health", async ({ page }) => {
-  test.setTimeout(120_000);
-  await test.step("check sso", async () => {
-    const eulaPromise = page.waitForResponse(res => res.url().startsWith(`${url}/eula`));
-    await page.goto("/");
-    await page.waitForLoadState("domcontentloaded");
-    await eulaPromise;
+type ScanSummary = {
+  status?: string;
+  result?: string;
+  scanned_timestamp?: number;
+};
 
-    await expect(page.getByRole("button", { name: "Login with OpenID" })).toBeVisible();
-    const termsCheckbox = page.getByRole("checkbox");
-    if (await termsCheckbox.isVisible()) {
-      await termsCheckbox.click();
-    }
-    const openIdPromise = page.waitForResponse(res => res.url().startsWith(`${url}/openId_auth`));
-    await page.getByRole("button", { name: "Login with OpenID" }).click();
-    await openIdPromise;
-    await expect(page).toHaveURL(
-      currentUrl =>
-        currentUrl.origin === url &&
-        ["/", "/index.html"].includes(currentUrl.pathname) &&
-        currentUrl.hash === "#/dashboard",
-      { timeout: FIFTEEN_SECONDS },
-    );
-    await expect(page.locator(".navbar-header")).toBeVisible({ timeout: FIFTEEN_SECONDS });
+type ScanSummaryEntry = {
+  workloadId?: string;
+  imageId?: string;
+  displayName: string;
+  summary?: ScanSummary;
+};
+
+type ScannedWorkloadsResponse = {
+  status: number;
+  body: string;
+  count: number;
+  scanSummaries: ScanSummaryEntry[];
+};
+
+const loginWithOpenId = async (page: Page) => {
+  const eulaPromise = page.waitForResponse((res) =>
+    res.url().startsWith(`${url}/eula`)
+  );
+  await page.goto("/");
+  await page.waitForLoadState("domcontentloaded");
+  await eulaPromise;
+
+  await expect(
+    page.getByRole("button", { name: "Login with OpenID" })
+  ).toBeVisible();
+  const termsCheckbox = page.getByRole("checkbox");
+  if (await termsCheckbox.isVisible()) {
+    await termsCheckbox.click();
+  }
+  const openIdPromise = page.waitForResponse((res) =>
+    res.url().startsWith(`${url}/openId_auth`)
+  );
+  await page.getByRole("button", { name: "Login with OpenID" }).click();
+  await openIdPromise;
+  await expect(page).toHaveURL(
+    (currentUrl) =>
+      currentUrl.origin === url &&
+      ["/", "/index.html"].includes(currentUrl.pathname) &&
+      currentUrl.hash === "#/dashboard",
+    { timeout: FIFTEEN_SECONDS }
+  );
+  await expect(page.locator(".navbar-header")).toBeVisible({
+    timeout: FIFTEEN_SECONDS,
+  });
+};
+
+test.describe("authenticated checks", () => {
+  test.describe.configure({ mode: "serial" });
+
+  test("validate system health", async ({ page }) => {
+    await loginWithOpenId(page);
+
+    // Expect counts for scanner, controller, enforcer are based on chart defaults
+    await test.step("check system components", async () => {
+      await page.goto("/#/controllers");
+      await page.waitForLoadState("domcontentloaded");
+
+      // Ensure at least three scanners are connected and at least one scan complete
+      await page.getByRole("tab", { name: "Scanners" }).click();
+      await page.waitForLoadState("domcontentloaded");
+      const scannerPromise = page.waitForResponse(`${url}/scanner`);
+      await page
+        .getByLabel("Scanners")
+        .getByRole("button", { name: "refresh Refresh" })
+        .click();
+      const scannerResponse = await scannerPromise;
+      const scannerData = await scannerResponse.json();
+
+      expect(scannerData).toHaveProperty("scanners");
+      expect(Array.isArray(scannerData.scanners)).toBe(true);
+      expect(scannerData.scanners.length).toBeGreaterThanOrEqual(3);
+
+      // Ensure at least three controller exists and all are connected
+      await page.getByRole("tab", { name: "Controllers" }).click();
+      await page.waitForLoadState("domcontentloaded");
+      const controllerPromise = page.waitForResponse(`${url}/controller`);
+      await page
+        .getByLabel("Controllers")
+        .getByRole("button", { name: "refresh Refresh" })
+        .click();
+      const controllerResponse = await controllerPromise;
+      const controllerData = await controllerResponse.json();
+
+      expect(controllerData).toHaveProperty("controllers");
+      expect(Array.isArray(controllerData.controllers)).toBe(true);
+      expect(controllerData.controllers.length).toBeGreaterThanOrEqual(3);
+      controllerData.controllers.forEach(
+        (controller: { connection_state: string }) => {
+          expect(controller.connection_state).toBe("connected");
+        }
+      );
+
+      // Ensure at least one enforcer exists and all are connected
+      await page.getByRole("tab", { name: "Enforcers" }).click();
+      await page.waitForLoadState("domcontentloaded");
+      const enforcerPromise = page.waitForResponse(`${url}/enforcer`);
+      await page
+        .getByLabel("Enforcers")
+        .getByRole("button", { name: "refresh Refresh" })
+        .click();
+      const enforcerResponse = await enforcerPromise;
+      const enforcerData = await enforcerResponse.json();
+
+      expect(enforcerData).toHaveProperty("enforcers");
+      expect(Array.isArray(enforcerData.enforcers)).toBe(true);
+      expect(enforcerData.enforcers.length).toBeGreaterThanOrEqual(1);
+      enforcerData.enforcers.forEach(
+        (enforcer: { connection_state: string }) => {
+          expect(enforcer.connection_state).toBe("connected");
+        }
+      );
+    });
   });
 
-  // Expect counts for scanner, controller, enforcer are based on chart defaults
-  await test.step("check system components", async () => {
-    await page.goto("/#/controllers");
-    await page.waitForLoadState("domcontentloaded");
+  test("validate scanning functionality", async ({ page }) => {
+    test.setTimeout(SCAN_TIMEOUT + FIFTEEN_SECONDS);
+    await loginWithOpenId(page);
+    await test.step("check scanning functionality", async () => {
+      const getScannedWorkloads = () =>
+        page.evaluate<ScannedWorkloadsResponse, string>(async (requestUrl) => {
+          type ScannedWorkload = {
+            brief?: {
+              id?: string;
+              display_name?: string;
+              image_id?: string;
+            };
+            security?: {
+              scan_summary?: ScanSummary;
+            };
+            children?: ScannedWorkload[];
+          };
 
-    // Ensure at least three scanners are connected and at least one scan complete
-    await page.getByRole("tab", { name: "Scanners" }).click();
-    await page.waitForLoadState("domcontentloaded");
-    const scannerPromise = page.waitForResponse(`${url}/scanner`);
-    await page.getByLabel("Scanners").getByRole("button", { name: "refresh Refresh" }).click();
-    const scannerResponse = await scannerPromise;
-    const scannerData = await scannerResponse.json();
+          const collectScanSummaries = (
+            workload: ScannedWorkload
+          ): ScanSummaryEntry[] => [
+            {
+              workloadId: workload.brief?.id,
+              imageId: workload.brief?.image_id,
+              displayName: workload.brief?.display_name ?? "unknown workload",
+              summary: workload.security?.scan_summary,
+            },
+            ...(workload.children?.flatMap(collectScanSummaries) ?? []),
+          ];
 
-    expect(scannerData).toHaveProperty("scanners");
-    expect(Array.isArray(scannerData.scanners)).toBe(true);
-    expect(scannerData.scanners.length).toBeGreaterThanOrEqual(3);
+          const storedToken = localStorage.getItem("token");
+          const token = storedToken
+            ? (JSON.parse(storedToken) as { token?: { token?: string } }).token
+                ?.token
+            : undefined;
+          const response = await fetch(requestUrl, {
+            headers: token ? { token } : undefined,
+          });
+          const body = await response.text();
+          const scannedWorkloads = response.ok
+            ? (JSON.parse(body) as ScannedWorkload[])
+            : [];
 
-    // Ensure at least three controller exists and all are connected
-    await page.getByRole("tab", { name: "Controllers" }).click();
-    await page.waitForLoadState("domcontentloaded");
-    const controllerPromise = page.waitForResponse(`${url}/controller`);
-    await page.getByLabel("Controllers").getByRole("button", { name: "refresh Refresh" }).click();
-    const controllerResponse = await controllerPromise;
-    const controllerData = await controllerResponse.json();
+          return {
+            status: response.status,
+            body,
+            count: scannedWorkloads.length,
+            scanSummaries: scannedWorkloads.flatMap(collectScanSummaries),
+          };
+        }, `${url}/workload/scanned?start=0&limit=10` satisfies string);
 
-    expect(controllerData).toHaveProperty("controllers");
-    expect(Array.isArray(controllerData.controllers)).toBe(true);
-    expect(controllerData.controllers.length).toBeGreaterThanOrEqual(3);
-    controllerData.controllers.forEach((controller: { connection_state: string }) => {
-      expect(controller.connection_state).toBe("connected");
-    });
+      const triggerScans = (workloadIds: string[]) =>
+        page.evaluate(
+          async ({ requestUrl, workloadIds }) => {
+            const storedToken = localStorage.getItem("token");
+            const token = storedToken
+              ? (JSON.parse(storedToken) as { token?: { token?: string } })
+                  .token?.token
+              : undefined;
 
-    // Ensure at least one enforcer exists and all are connected
-    await page.getByRole("tab", { name: "Enforcers" }).click();
-    await page.waitForLoadState("domcontentloaded");
-    const enforcerPromise = page.waitForResponse(`${url}/enforcer`);
-    await page.getByLabel("Enforcers").getByRole("button", { name: "refresh Refresh" }).click();
-    const enforcerResponse = await enforcerPromise;
-    const enforcerData = await enforcerResponse.json();
+            const responses = await Promise.all(
+              workloadIds.map(async (workloadId) => {
+                const response = await fetch(requestUrl, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "text/plain",
+                    ...(token ? { Token: token } : {}),
+                  },
+                  body: workloadId,
+                });
 
-    expect(enforcerData).toHaveProperty("enforcers");
-    expect(Array.isArray(enforcerData.enforcers)).toBe(true);
-    expect(enforcerData.enforcers.length).toBeGreaterThanOrEqual(1);
-    enforcerData.enforcers.forEach((enforcer: { connection_state: string }) => {
-      expect(enforcer.connection_state).toBe("connected");
-    });
-  });
+                return {
+                  workloadId,
+                  status: response.status,
+                  body: await response.text(),
+                };
+              })
+            );
 
-  await test.step("check scanning functionality", async () => {
-    const scannedWorkloadsResponse = await page.evaluate(async requestUrl => {
-      const storedToken = localStorage.getItem("token");
-      const token = storedToken ? (JSON.parse(storedToken) as { token?: { token?: string } }).token?.token : undefined;
-      const response = await fetch(requestUrl, {
-        headers: token ? { token } : undefined,
-      });
-      const body = await response.text();
-      const scannedWorkloads = response.ok ? JSON.parse(body) as unknown[] : [];
+            return responses;
+          },
+          { requestUrl: `${url}/scan/workload`, workloadIds }
+        );
 
-      return {
-        status: response.status,
-        body,
-        count: scannedWorkloads.length,
+      const deadline = Date.now() + SCAN_TIMEOUT;
+      let scannedWorkloadsResponse:
+        | Awaited<ReturnType<typeof getScannedWorkloads>>
+        | undefined;
+
+      const initialScannedWorkloads = await getScannedWorkloads();
+      expect(initialScannedWorkloads.status, initialScannedWorkloads.body).toBe(
+        200
+      );
+      expect(
+        initialScannedWorkloads.count,
+        initialScannedWorkloads.body
+      ).toBeGreaterThan(0);
+      expect(
+        initialScannedWorkloads.scanSummaries.length,
+        initialScannedWorkloads.body
+      ).toBeGreaterThan(0);
+
+      const targetImageIds = new Set<string>();
+      const scanTargets = initialScannedWorkloads.scanSummaries
+        .filter(({ workloadId, imageId }) => {
+          if (!workloadId || !imageId || targetImageIds.has(imageId)) {
+            return false;
+          }
+
+          targetImageIds.add(imageId);
+          return true;
+        })
+        .slice(0, MAX_SCAN_TARGETS);
+      const scanTargetIds = scanTargets
+        .map(({ workloadId }) => workloadId)
+        .filter((workloadId): workloadId is string => Boolean(workloadId));
+
+      const initialScanTimestamps = new Map(
+        scanTargets.map(({ workloadId, summary }) => [
+          workloadId,
+          summary?.scanned_timestamp,
+        ])
+      );
+
+      expect(
+        scanTargetIds.length,
+        initialScannedWorkloads.body
+      ).toBeGreaterThan(0);
+      const scanRequests = await triggerScans(scanTargetIds);
+      expect(
+        scanRequests.filter(({ status }) => status !== 200),
+        `Failed to trigger scans: ${JSON.stringify(scanRequests)}`
+      ).toEqual([]);
+
+      const observedScanProgress = new Set<string>();
+      const isFreshScan = (workloadId: string, summary?: ScanSummary) => {
+        const scannedTimestamp = summary?.scanned_timestamp;
+        const initialScannedTimestamp = initialScanTimestamps.get(workloadId);
+
+        return (
+          scannedTimestamp !== undefined &&
+          (initialScannedTimestamp === undefined
+            ? observedScanProgress.has(workloadId)
+            : scannedTimestamp > initialScannedTimestamp)
+        );
       };
-    }, `${url}/workload/scanned?start=0&limit=10` satisfies string);
-    expect(scannedWorkloadsResponse.status, scannedWorkloadsResponse.body).toBe(200);
-    expect(scannedWorkloadsResponse.count).toBeGreaterThan(0);
+
+      while (Date.now() < deadline) {
+        scannedWorkloadsResponse = await getScannedWorkloads();
+        expect(
+          scannedWorkloadsResponse.status,
+          scannedWorkloadsResponse.body
+        ).toBe(200);
+        const triggeredScans = scannedWorkloadsResponse.scanSummaries.filter(
+          ({ workloadId }) => workloadId && scanTargetIds.includes(workloadId)
+        );
+        triggeredScans.forEach(({ workloadId, summary }) => {
+          if (
+            workloadId &&
+            (summary?.status === "scheduled" || summary?.status === "scanning")
+          ) {
+            observedScanProgress.add(workloadId);
+          }
+        });
+        const freshTriggeredScans = triggeredScans.filter(
+          ({ workloadId, summary }) =>
+            workloadId !== undefined && isFreshScan(workloadId, summary)
+        );
+
+        const failures = freshTriggeredScans.filter(
+          ({ summary }) =>
+            summary?.status === "failed" ||
+            (summary?.status === "finished" && summary.result !== "succeeded")
+        );
+        expect(
+          failures,
+          `Terminal scan failures: ${failures
+            .map(
+              ({ displayName, summary }) =>
+                `${displayName} (status=${
+                  summary?.status ?? "missing"
+                }, result=${summary?.result ?? "missing"})`
+            )
+            .join(", ")}`
+        ).toEqual([]);
+
+        if (
+          freshTriggeredScans.length === scanTargetIds.length &&
+          freshTriggeredScans.every(
+            ({ summary }) =>
+              summary?.status === "finished" && summary.result === "succeeded"
+          )
+        ) {
+          return;
+        }
+
+        await page.waitForTimeout(SCAN_POLL_INTERVAL);
+      }
+
+      expect(
+        scannedWorkloadsResponse,
+        "No scan response received before timeout"
+      ).toBeDefined();
+      expect(
+        scannedWorkloadsResponse?.scanSummaries.filter(
+          ({ workloadId, summary }) =>
+            workloadId &&
+            scanTargetIds.includes(workloadId) &&
+            isFreshScan(workloadId, summary) &&
+            summary?.status === "finished" &&
+            summary.result === "succeeded"
+        ).length,
+        `No successful retriggered scan completed within ${
+          SCAN_TIMEOUT / 1000
+        } seconds: ${scannedWorkloadsResponse?.body}`
+      ).toBe(scanTargetIds.length);
+    });
   });
 });
 
 test("validate local login is blocked", async ({ page }) => {
   await test.step("check local login", async () => {
-    const eulaPromise = page.waitForResponse(res => res.url().startsWith(`${url}/eula`));
+    const eulaPromise = page.waitForResponse((res) =>
+      res.url().startsWith(`${url}/eula`)
+    );
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
     await eulaPromise;
@@ -126,7 +376,10 @@ test("validate local login is blocked", async ({ page }) => {
 
 // Add a 15 second delay after a test failure
 test.afterEach(async ({ page }, testInfo) => {
-  if (testInfo.status === testInfo.expectedStatus || testInfo.retry === testInfo.project.retries) {
+  if (
+    testInfo.status === testInfo.expectedStatus ||
+    testInfo.retry === testInfo.project.retries
+  ) {
     return;
   }
 
