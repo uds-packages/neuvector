@@ -35,11 +35,11 @@ components:
         valuesFiles:
           - values/upstream-values.yaml
     images:
-      - docker.io/neuvector/controller:5.6.0
-      - docker.io/neuvector/manager:5.6.0
-      - docker.io/neuvector/updater:0.0.13
+      - docker.io/neuvector/controller:5.6.1
+      - docker.io/neuvector/manager:5.6.1
+      - docker.io/neuvector/updater:0.0.14
       - docker.io/neuvector/scanner:6
-      - docker.io/neuvector/enforcer:5.6.0
+      - docker.io/neuvector/enforcer:5.6.1
 
   - name: neuvector
     required: true
@@ -53,11 +53,11 @@ components:
         valuesFiles:
           - values/registry1-values.yaml
     images:
-      - registry1.dso.mil/ironbank/neuvector/neuvector/controller:5.6.0
-      - registry1.dso.mil/ironbank/neuvector/neuvector/manager:5.6.0
+      - registry1.dso.mil/ironbank/neuvector/neuvector/controller:5.6.1
+      - registry1.dso.mil/ironbank/neuvector/neuvector/manager:5.6.1
       - registry1.dso.mil/ironbank/redhat/ubi/ubi9-minimal:9.8
       - registry1.dso.mil/ironbank/neuvector/neuvector/scanner:6
-      - registry1.dso.mil/ironbank/neuvector/neuvector/enforcer:5.6.0
+      - registry1.dso.mil/ironbank/neuvector/neuvector/enforcer:5.6.1
 
   - name: neuvector
     required: true
@@ -71,9 +71,9 @@ components:
         valuesFiles:
           - values/unicorn-values.yaml
     images:
-      - cgr.dev/defenseunicorns.com/neuvector-controller-fips:v5.6.0
-      - cgr.dev/defenseunicorns.com/neuvector-manager:v5.6.0
-      - cgr.dev/defenseunicorns.com/neuvector-enforcer-fips:v5.6.0
-      - cgr.dev/defenseunicorns.com/curl-fips:v8.21.0-dev
+      - cgr.dev/defenseunicorns.com/neuvector-controller-fips:v5.6.1
+      - cgr.dev/defenseunicorns.com/neuvector-manager:v5.6.1
+      - cgr.dev/defenseunicorns.com/neuvector-enforcer-fips:v5.6.1
+      - cgr.dev/defenseunicorns.com/curl-fips:v8.22.0-dev
       # v4 is Chainguard's equivalent of upstream's floating :6 tag, different scheme
       - cgr.dev/defenseunicorns.com/neuvector-scanner-fips:v4
