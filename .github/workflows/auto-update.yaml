@@ -32,7 +32,7 @@ concurrency:
 
 jobs:
   auto-update:
-    uses: defenseunicorns/uds-common/.github/workflows/callable-auto-update.yaml@f96b0f22cd24e4e7e682184cfa502715fa65708d # v1.27.1
+    uses: defenseunicorns/uds-common/.github/workflows/callable-auto-update.yaml@d940b16c44821fe7a84b7725bdadf7d4fa541c8f # v1.28.1
     with:
       dry-run: ${{ github.event_name == 'workflow_dispatch' && inputs.dry-run || false }}
     secrets: inherit # Inherits all secrets from the parent workflow.
