@@ -22,6 +22,11 @@ variables:
   - name: ADMIN_DOMAIN
     description: "Domain for admin services, defaults to `admin.DOMAIN`"
 
+values:
+  files:
+    - zarf-values.yaml
+  schema: zarf-values.schema.json
+
 components:
   - name: neuvector
     required: true

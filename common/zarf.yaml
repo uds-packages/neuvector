@@ -16,12 +16,18 @@ components:
         version: 2.11.2
         namespace: neuvector
         gitPath: charts/crd
+        values:
+          - sourcePath: .crd
+            targetPath: .
       - name: uds-neuvector-config
         namespace: neuvector
         version: 0.1.0
         localPath: ../chart
         valuesFiles:
           - ../chart/values.yaml
+        values:
+          - sourcePath: .uds-neuvector-config
+            targetPath: .
       - name: core
         url: https://neuvector.github.io/neuvector-helm/
         version: 2.11.2
@@ -29,3 +35,28 @@ components:
         gitPath: charts/core
         valuesFiles:
           - ../values/common-values.yaml
+        values:
+          - sourcePath: .core
+            targetPath: .
+            excludePaths:
+              - .core.registry
+              - .core.tag
+              - .core.controller.image
+              - .core.controller.prime.image
+              - .core.enforcer.image
+              - .core.manager.image
+              - .core.cve.adapter.image
+              - .core.cve.updater.image
+              - .core.cve.scanner.image
+              - .core.global.azure.images
+              - .core.global.aws.image
+              - .core.imagePullSecrets
+              - .core.global.azure.imagePullSecrets
+              - .core.global.aws.imagePullSecrets
+              - .core.enforcer.securityContext
+              - .core.controller.certupgrader.runAsUser
+              - .core.manager.runAsUser
+              - .core.cve.adapter.runAsUser
+              - .core.cve.updater.runAsUser
+              - .core.cve.scanner.runAsUser
+              - .core.leastPrivilege
