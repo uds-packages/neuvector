@@ -42,10 +42,8 @@ components:
               - .core.registry
               - .core.tag
               - .core.controller.image
-              - .core.controller.prime.image
               - .core.enforcer.image
               - .core.manager.image
-              - .core.cve.adapter.image
               - .core.cve.updater.image
               - .core.cve.scanner.image
               - .core.global.azure.images
@@ -56,7 +54,8 @@ components:
               - .core.enforcer.securityContext
               - .core.controller.certupgrader.runAsUser
               - .core.manager.runAsUser
-              - .core.cve.adapter.runAsUser
               - .core.cve.updater.runAsUser
               - .core.cve.scanner.runAsUser
               - .core.leastPrivilege
+              - .core.controller.prime
+              - .core.cve.adapter

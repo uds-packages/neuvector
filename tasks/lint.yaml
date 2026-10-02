@@ -1,0 +1,140 @@
+# Copyright 2026 Defense Unicorns
+# SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-Defense-Unicorns-Commercial
+
+includes:
+  - remote: https://raw.githubusercontent.com/defenseunicorns/uds-common/v1.30.1/tasks/lint.yaml
+
+tasks:
+  # Keep the shared lint task names and inputs available under lint:*.
+  - name: deps
+    description: Install shared lint dependencies
+    actions:
+      - task: remote:deps
+
+  - name: all
+    description: Run shared lint, values lint, and CI schema drift checks
+    actions:
+      - task: remote:all
+      - task: values-lint
+      - task: values-check
+
+  - name: yaml
+    description: Run shared YAML lint
+    actions:
+      - task: remote:yaml
+
+  - name: shell
+    description: Run shared shell lint
+    inputs:
+      task_globs:
+        default: tasks.y[a]ml tasks/*.yaml
+      shell_globs:
+        default: "*.sh **/*.sh **/**/*.sh **/**/**/*.sh **/**/**/**/*.sh **/**/**/**/**/*.sh **/**/**/**/**/**/*.sh **/**/**/**/**/**/**/*.sh"
+      zarf_globs:
+        default: zarf.y[a]ml **/zarf.yaml **/**/zarf.yaml **/**/**/zarf.yaml **/**/**/**/zarf.yaml  **/**/**/**/**/zarf.yaml
+      exclusion:
+        default: ""
+    actions:
+      - task: remote:shell
+        with:
+          task_globs: "${{ .inputs.task_globs }}"
+          shell_globs: "${{ .inputs.shell_globs }}"
+          zarf_globs: "${{ .inputs.zarf_globs }}"
+          exclusion: "${{ .inputs.exclusion }}"
+
+  - name: license
+    description: Run shared license lint
+    inputs:
+      fix:
+        default: "false"
+      paths:
+        default: .
+    actions:
+      - task: remote:license
+        with:
+          fix: "${{ .inputs.fix }}"
+          paths: "${{ .inputs.paths }}"
+
+  - name: tasks
+    description: Run shared task validation
+    actions:
+      - task: remote:tasks
+
+  - name: helm
+    description: Run shared Helm lint
+    inputs:
+      paths:
+        default: .
+    actions:
+      - task: remote:helm
+        with:
+          paths: "${{ .inputs.paths }}"
+
+  - name: helm-template
+    description: Run shared Helm rendering checks
+    inputs:
+      paths:
+        default: .
+    actions:
+      - task: remote:helm-template
+        with:
+          paths: "${{ .inputs.paths }}"
+
+  - name: fix-license
+    description: Run shared license fixing
+    inputs:
+      paths:
+        default: .
+    actions:
+      - task: remote:fix-license
+        with:
+          paths: "${{ .inputs.paths }}"
+
+  - name: values-lint
+    description: Lint Zarf values mappings for every supported flavor
+    actions:
+      - description: Lint composed package definitions
+        shell:
+          darwin: bash
+          linux: bash
+        cmd: |
+          set -euo pipefail
+          for flavor in upstream registry1 unicorn; do
+            uds zarf dev lint . --flavor "$flavor"
+          done
+
+  - name: values-check
+    description: Regenerate the Zarf values schema in CI and fail on Git changes
+    actions:
+      - description: Check generated schema for diffs in CI
+        shell:
+          darwin: bash
+          linux: bash
+        cmd: |
+          set -euo pipefail
+          if [ "${CI:-false}" != "true" ]; then
+            exit 0
+          fi
+          uds run -f tasks/lint.yaml values-generate --no-progress
+          if [ -n "$(git status --short -- zarf-values.schema.json)" ]; then
+            echo "ERROR: Zarf values schema is out of date. Run uds run lint:values-generate and commit the changes."
+            git diff --stat -- zarf-values.schema.json
+            exit 1
+          fi
+
+  - name: values-generate
+    description: Regenerate the Zarf values schema from package definitions
+    actions:
+      - description: Replace the schema only after successful generation
+        shell:
+          darwin: bash
+          linux: bash
+        cmd: |
+          set -euo pipefail
+          tmp=$(mktemp)
+          if ! uds zarf dev generate-schema . --flavor upstream --delete-not-found > "$tmp"; then
+            rm -f "$tmp"
+            echo "ERROR: values schema generation failed"
+            exit 1
+          fi
+          mv "$tmp" zarf-values.schema.json
