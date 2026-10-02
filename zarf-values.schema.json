@@ -1,0 +1,1459 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "properties": {
+    "core": {
+      "properties": {
+        "admissionwebhook": {
+          "properties": {
+            "type": {
+              "enum": [
+                "ClusterIP",
+                "NodePort",
+                "LoadBalancer",
+                "ExternalName"
+              ],
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "autoGenerateCert": {
+          "type": "boolean"
+        },
+        "bootstrapPassword": {
+          "type": "string"
+        },
+        "bottlerocket": {
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "runtimePath": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "containerd": {
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "controller": {
+          "properties": {
+            "affinity": {
+              "properties": {
+                "podAntiAffinity": {
+                  "properties": {
+                    "preferredDuringSchedulingIgnoredDuringExecution": {
+                      "items": {
+                        "properties": {
+                          "podAffinityTerm": {
+                            "properties": {
+                              "labelSelector": {
+                                "properties": {
+                                  "matchExpressions": {
+                                    "items": {
+                                      "properties": {
+                                        "key": {
+                                          "type": "string"
+                                        },
+                                        "operator": {
+                                          "type": "string"
+                                        },
+                                        "values": {
+                                          "items": {
+                                            "type": "string"
+                                          },
+                                          "type": "array"
+                                        }
+                                      },
+                                      "type": "object"
+                                    },
+                                    "type": "array"
+                                  }
+                                },
+                                "type": "object"
+                              },
+                              "topologyKey": {
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "weight": {
+                            "maximum": 100,
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "annotations": {
+              "properties": {},
+              "type": "object"
+            },
+            "apisvc": {
+              "properties": {
+                "annotations": {
+                  "properties": {},
+                  "type": "object"
+                },
+                "ctrlServerPort": {
+                  "type": "number"
+                },
+                "nodePort": {},
+                "route": {
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "host": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "termination": {
+                      "enum": [
+                        "passthrough",
+                        "reencrypt"
+                      ],
+                      "type": "string"
+                    },
+                    "tls": {
+                      "properties": {
+                        "caCertificate": {
+                          "type": "string"
+                        },
+                        "certificate": {
+                          "type": "string"
+                        },
+                        "destinationCACertificate": {
+                          "type": "string"
+                        },
+                        "key": {
+                          "type": "string"
+                        }
+                      },
+                      "type": [
+                        "object",
+                        "null"
+                      ]
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "azureFileShare": {
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "secretName": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "shareName": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "certificate": {
+              "properties": {
+                "keyFile": {
+                  "type": "string"
+                },
+                "pemFile": {
+                  "type": "string"
+                },
+                "secret": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "certupgrader": {
+              "properties": {
+                "env": {
+                  "type": "array"
+                },
+                "imagePullPolicy": {
+                  "type": "string"
+                },
+                "nodeSelector": {
+                  "properties": {},
+                  "type": "object"
+                },
+                "podAnnotations": {
+                  "properties": {},
+                  "type": "object"
+                },
+                "podLabels": {
+                  "properties": {},
+                  "type": "object"
+                },
+                "priorityClassName": {},
+                "resources": {
+                  "properties": {},
+                  "type": "object"
+                },
+                "schedule": {
+                  "type": "string"
+                },
+                "timeout": {
+                  "type": "number"
+                },
+                "tolerations": {
+                  "type": "array"
+                }
+              },
+              "type": "object"
+            },
+            "configmap": {
+              "properties": {
+                "data": {
+                  "properties": {
+                    "sysinitcfg.yaml": {
+                      "type": "string"
+                    }
+                  },
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "enabled": {
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            },
+            "disruptionbudget": {
+              "type": "integer"
+            },
+            "enabled": {
+              "type": "boolean"
+            },
+            "env": {
+              "items": {
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "federation": {
+              "properties": {
+                "managedsvc": {
+                  "properties": {
+                    "annotations": {
+                      "properties": {},
+                      "type": "object"
+                    },
+                    "clusterIP": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "externalTrafficPolicy": {},
+                    "ingress": {
+                      "properties": {
+                        "annotations": {
+                          "properties": {
+                            "ingress.kubernetes.io/rewrite-target": {
+                              "type": "string"
+                            },
+                            "nginx.ingress.kubernetes.io/backend-protocol": {
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "enabled": {
+                          "type": "boolean"
+                        },
+                        "host": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "ingressClassName": {
+                          "type": "string"
+                        },
+                        "path": {
+                          "type": "string"
+                        },
+                        "secretName": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "tls": {
+                          "type": "boolean"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "internalTrafficPolicy": {},
+                    "loadBalancerIP": {},
+                    "nodePort": {},
+                    "route": {
+                      "properties": {
+                        "enabled": {
+                          "type": "boolean"
+                        },
+                        "host": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "termination": {
+                          "enum": [
+                            "passthrough",
+                            "reencrypt"
+                          ],
+                          "type": "string"
+                        },
+                        "tls": {
+                          "properties": {
+                            "caCertificate": {
+                              "type": "string"
+                            },
+                            "certificate": {
+                              "type": "string"
+                            },
+                            "destinationCACertificate": {
+                              "type": "string"
+                            },
+                            "key": {
+                              "type": "string"
+                            }
+                          },
+                          "type": [
+                            "object",
+                            "null"
+                          ]
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": {
+                      "enum": [
+                        "ClusterIP",
+                        "NodePort",
+                        "LoadBalancer",
+                        "ExternalName",
+                        null
+                      ]
+                    }
+                  },
+                  "type": "object"
+                },
+                "mastersvc": {
+                  "properties": {
+                    "annotations": {
+                      "properties": {},
+                      "type": "object"
+                    },
+                    "clusterIP": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "externalTrafficPolicy": {},
+                    "ingress": {
+                      "properties": {
+                        "annotations": {
+                          "properties": {
+                            "ingress.kubernetes.io/rewrite-target": {
+                              "type": "string"
+                            },
+                            "nginx.ingress.kubernetes.io/backend-protocol": {
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "enabled": {
+                          "type": "boolean"
+                        },
+                        "host": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "ingressClassName": {
+                          "type": "string"
+                        },
+                        "path": {
+                          "type": "string"
+                        },
+                        "secretName": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "tls": {
+                          "type": "boolean"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "internalTrafficPolicy": {},
+                    "loadBalancerIP": {},
+                    "nodePort": {},
+                    "route": {
+                      "properties": {
+                        "enabled": {
+                          "type": "boolean"
+                        },
+                        "host": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "termination": {
+                          "enum": [
+                            "passthrough",
+                            "reencrypt"
+                          ],
+                          "type": "string"
+                        },
+                        "tls": {
+                          "properties": {
+                            "caCertificate": {
+                              "type": "string"
+                            },
+                            "certificate": {
+                              "type": "string"
+                            },
+                            "destinationCACertificate": {
+                              "type": "string"
+                            },
+                            "key": {
+                              "type": "string"
+                            }
+                          },
+                          "type": [
+                            "object",
+                            "null"
+                          ]
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": {
+                      "enum": [
+                        "ClusterIP",
+                        "NodePort",
+                        "LoadBalancer",
+                        "ExternalName",
+                        null
+                      ]
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "ingress": {
+              "properties": {
+                "annotations": {
+                  "properties": {
+                    "ingress.kubernetes.io/rewrite-target": {
+                      "type": "string"
+                    },
+                    "nginx.ingress.kubernetes.io/backend-protocol": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "enabled": {
+                  "type": "boolean"
+                },
+                "host": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "ingressClassName": {
+                  "type": "string"
+                },
+                "path": {
+                  "type": "string"
+                },
+                "secretName": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "tls": {
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            },
+            "internal": {
+              "properties": {
+                "certificate": {
+                  "properties": {
+                    "caFile": {
+                      "type": "string"
+                    },
+                    "keyFile": {
+                      "type": "string"
+                    },
+                    "pemFile": {
+                      "type": "string"
+                    },
+                    "secret": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "nodeSelector": {
+              "properties": {},
+              "type": "object"
+            },
+            "podAnnotations": {
+              "properties": {},
+              "type": "object"
+            },
+            "podLabels": {
+              "properties": {},
+              "type": "object"
+            },
+            "priorityClassName": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "pvc": {
+              "properties": {
+                "accessModes": {
+                  "items": {
+                    "enum": [
+                      "ReadWriteOnce",
+                      "ReadOnlyMany",
+                      "ReadWriteMany",
+                      "ReadWriteOncePod"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "capacity": {
+                  "pattern": "^([0-9]+)(m|k|M|G|T|P|E|Ki|Mi|Gi|Ti|Pi|Ei)$",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "enabled": {
+                  "type": "boolean"
+                },
+                "existingClaim": {
+                  "type": [
+                    "boolean",
+                    "string"
+                  ]
+                },
+                "storageClass": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "ranchersso": {
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            },
+            "replicas": {
+              "type": "integer"
+            },
+            "resources": {
+              "properties": {},
+              "type": "object"
+            },
+            "schedulerName": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "searchRegistries": {},
+            "secret": {
+              "properties": {
+                "data": {
+                  "properties": {
+                    "userinitcfg.yaml": {
+                      "properties": {
+                        "users": {
+                          "items": {
+                            "properties": {
+                              "Fullname": {
+                                "type": "string"
+                              },
+                              "Password": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "Role": {
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "enabled": {
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            },
+            "strategy": {
+              "properties": {
+                "rollingUpdate": {
+                  "properties": {
+                    "maxSurge": {
+                      "type": "integer"
+                    },
+                    "maxUnavailable": {
+                      "type": "integer"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": {
+                  "enum": [
+                    "Recreate",
+                    "RollingUpdate"
+                  ],
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "tolerations": {
+              "type": "array"
+            },
+            "topologySpreadConstraints": {
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "crdwebhook": {
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "type": {
+              "enum": [
+                "ClusterIP",
+                "NodePort",
+                "LoadBalancer",
+                "ExternalName"
+              ],
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "crdwebhooksvc": {
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "crio": {
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "cve": {
+          "properties": {
+            "scanner": {
+              "properties": {
+                "affinity": {
+                  "properties": {},
+                  "type": "object"
+                },
+                "dockerPath": {
+                  "type": "string"
+                },
+                "enabled": {
+                  "type": "boolean"
+                },
+                "env": {
+                  "type": "array"
+                },
+                "internal": {
+                  "properties": {
+                    "certificate": {
+                      "properties": {
+                        "caFile": {
+                          "type": "string"
+                        },
+                        "keyFile": {
+                          "type": "string"
+                        },
+                        "pemFile": {
+                          "type": "string"
+                        },
+                        "secret": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "nodeSelector": {
+                  "properties": {},
+                  "type": "object"
+                },
+                "podAnnotations": {
+                  "properties": {},
+                  "type": "object"
+                },
+                "podLabels": {
+                  "properties": {},
+                  "type": "object"
+                },
+                "priorityClassName": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "replicas": {
+                  "type": "integer"
+                },
+                "resources": {
+                  "properties": {},
+                  "type": "object"
+                },
+                "strategy": {
+                  "properties": {
+                    "rollingUpdate": {
+                      "properties": {
+                        "maxSurge": {
+                          "type": "integer"
+                        },
+                        "maxUnavailable": {
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": {
+                      "enum": [
+                        "Recreate",
+                        "RollingUpdate"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "tolerations": {
+                  "type": "array"
+                },
+                "topologySpreadConstraints": {
+                  "type": "array"
+                },
+                "volumeMounts": {
+                  "items": {
+                    "properties": {
+                      "mountPath": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "volumes": {
+                  "items": {
+                    "properties": {
+                      "emptyDir": {
+                        "properties": {
+                          "sizeLimit": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "type": "object"
+            },
+            "updater": {
+              "properties": {
+                "cacert": {
+                  "type": "string"
+                },
+                "enabled": {
+                  "type": "boolean"
+                },
+                "nodeSelector": {
+                  "properties": {},
+                  "type": "object"
+                },
+                "podAnnotations": {
+                  "properties": {},
+                  "type": "object"
+                },
+                "podLabels": {
+                  "properties": {},
+                  "type": "object"
+                },
+                "priorityClassName": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "resources": {
+                  "properties": {},
+                  "type": "object"
+                },
+                "schedule": {
+                  "type": "string"
+                },
+                "secure": {
+                  "type": "boolean"
+                },
+                "tolerations": {
+                  "type": "array"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "defaultValidityPeriod": {
+          "type": "integer"
+        },
+        "docker": {
+          "properties": {
+            "path": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "enforcer": {
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "env": {
+              "type": "array"
+            },
+            "internal": {
+              "properties": {
+                "certificate": {
+                  "properties": {
+                    "caFile": {
+                      "type": "string"
+                    },
+                    "keyFile": {
+                      "type": "string"
+                    },
+                    "pemFile": {
+                      "type": "string"
+                    },
+                    "secret": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "podAnnotations": {
+              "properties": {},
+              "type": "object"
+            },
+            "podLabels": {
+              "properties": {},
+              "type": "object"
+            },
+            "priorityClassName": {},
+            "resources": {
+              "properties": {},
+              "type": "object"
+            },
+            "tolerations": {
+              "items": {
+                "properties": {
+                  "effect": {
+                    "enum": [
+                      "NoExecute",
+                      "NoSchedule",
+                      "PreferNoSchedule"
+                    ],
+                    "type": "string"
+                  },
+                  "key": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "updateStrategy": {
+              "properties": {
+                "type": {
+                  "enum": [
+                    "Recreate",
+                    "RollingUpdate"
+                  ],
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "global": {
+          "properties": {
+            "aws": {
+              "properties": {
+                "accountNumber": {
+                  "type": [
+                    "integer",
+                    "string"
+                  ]
+                },
+                "annotations": {
+                  "properties": {},
+                  "type": "object"
+                },
+                "enabled": {
+                  "type": "boolean"
+                },
+                "roleName": {
+                  "type": "string"
+                },
+                "serviceAccount": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "azure": {
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "extension": {
+                  "properties": {
+                    "resourceId": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "identity": {
+                  "properties": {
+                    "clientId": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "marketplace": {
+                  "properties": {
+                    "planId": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "serviceAccount": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "cattle": {
+              "properties": {
+                "clusterName": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "ingressController": {
+          "type": "string"
+        },
+        "internal": {
+          "properties": {
+            "autoGenerateCert": {
+              "type": "boolean"
+            },
+            "autoRotateCert": {
+              "type": "boolean"
+            },
+            "certmanager": {
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "secretname": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "k3s": {
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "runtimePath": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "lease": {
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "manager": {
+          "properties": {
+            "affinity": {
+              "properties": {},
+              "type": "object"
+            },
+            "certificate": {
+              "properties": {
+                "keyFile": {
+                  "type": "string"
+                },
+                "pemFile": {
+                  "type": "string"
+                },
+                "secret": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "enabled": {
+              "type": "boolean"
+            },
+            "env": {
+              "properties": {
+                "envs": {
+                  "items": {
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "ssl": {
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            },
+            "ingress": {
+              "properties": {
+                "annotations": {
+                  "properties": {
+                    "ingress.kubernetes.io/rewrite-target": {
+                      "type": "string"
+                    },
+                    "kubernetes.io/ingress.class": {
+                      "type": "string"
+                    },
+                    "nginx.ingress.kubernetes.io/backend-protocol": {
+                      "type": "string"
+                    },
+                    "nginx.ingress.kubernetes.io/enable-rewrite-log": {
+                      "type": "string"
+                    },
+                    "nginx.ingress.kubernetes.io/whitelist-source-range": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "enabled": {
+                  "type": "boolean"
+                },
+                "host": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "ingressClassName": {
+                  "type": "string"
+                },
+                "path": {
+                  "type": "string"
+                },
+                "secretName": {},
+                "tls": {
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            },
+            "nodeSelector": {
+              "properties": {},
+              "type": "object"
+            },
+            "podAnnotations": {
+              "properties": {},
+              "type": "object"
+            },
+            "podLabels": {
+              "properties": {
+                "istio.io/ingress-use-waypoint": {
+                  "type": "string"
+                },
+                "istio.io/use-waypoint": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "priorityClassName": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "probes": {
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "periodSeconds": {
+                  "type": "number"
+                },
+                "startupFailureThreshold": {
+                  "type": "number"
+                },
+                "timeout": {
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            },
+            "resources": {
+              "properties": {},
+              "type": "object"
+            },
+            "route": {
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "host": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "termination": {
+                  "enum": [
+                    "passthrough",
+                    "reencrypt",
+                    "edge"
+                  ],
+                  "type": "string"
+                },
+                "tls": {
+                  "properties": {
+                    "caCertificate": {
+                      "type": "string"
+                    },
+                    "certificate": {
+                      "type": "string"
+                    },
+                    "destinationCACertificate": {
+                      "type": "string"
+                    },
+                    "key": {
+                      "type": "string"
+                    }
+                  },
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "svc": {
+              "properties": {
+                "annotations": {
+                  "properties": {},
+                  "type": "object"
+                },
+                "loadBalancerIP": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "mgrServerPort": {
+                  "type": "number"
+                },
+                "nodePort": {},
+                "type": {
+                  "enum": [
+                    "ClusterIP",
+                    "NodePort",
+                    "LoadBalancer",
+                    "ExternalName"
+                  ],
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "tolerations": {
+              "type": "array"
+            },
+            "topologySpreadConstraints": {
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "oem": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "openshift": {
+          "type": "boolean"
+        },
+        "psp": {
+          "type": "boolean"
+        },
+        "rbac": {
+          "type": "boolean"
+        },
+        "resources": {
+          "properties": {},
+          "type": "object"
+        },
+        "runtimePath": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "serviceAccount": {
+          "type": "string"
+        },
+        "traefik": {
+          "properties": {
+            "serversTransport": {
+              "properties": {
+                "insecureSkipVerify": {
+                  "type": "boolean"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "rootCAsSecrets": {
+                  "type": "array"
+                },
+                "serverName": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "crd": {
+      "properties": {
+        "crdwebhook": {
+          "properties": {
+            "type": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "openshift": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "uds-neuvector-config": {
+      "properties": {
+        "additionalNetworkAllow": {
+          "type": "array"
+        },
+        "adminDomain": {
+          "type": "string"
+        },
+        "denyLocalAuth": {
+          "type": "boolean"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "generateInternalCert": {
+          "type": "boolean"
+        },
+        "sso": {
+          "properties": {
+            "adminGroups": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "readerGroups": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "type": "object"
+}
