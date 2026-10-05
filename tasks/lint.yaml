@@ -18,6 +18,11 @@ tasks:
       - task: values-lint
       - task: values-check
 
+  - name: renovate
+    description: Validate Renovate configuration
+    actions:
+      - task: remote:renovate
+
   - name: yaml
     description: Run shared YAML lint
     actions:
