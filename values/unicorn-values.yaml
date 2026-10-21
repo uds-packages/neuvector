@@ -42,4 +42,4 @@ cve:
     image:
       repository: defenseunicorns.com/curl-fips
       # renovate: datasource=docker depName=cgr.dev/defenseunicorns.com/curl-fips versioning=docker
-      tag: "v8.22.0-dev"
+      tag: "v8.23.0-dev"
