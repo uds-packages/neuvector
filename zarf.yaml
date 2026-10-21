@@ -76,9 +76,9 @@ components:
         valuesFiles:
           - values/unicorn-values.yaml
     images:
-      - cgr.dev/defenseunicorns.com/neuvector-controller-fips:v5.6.2
-      - cgr.dev/defenseunicorns.com/neuvector-manager:v5.6.2
-      - cgr.dev/defenseunicorns.com/neuvector-enforcer-fips:v5.6.2
+      - cgr.dev/defenseunicorns.com/neuvector-controller-fips:v5.6.3
+      - cgr.dev/defenseunicorns.com/neuvector-manager:v5.6.3
+      - cgr.dev/defenseunicorns.com/neuvector-enforcer-fips:v5.6.3
       - cgr.dev/defenseunicorns.com/curl-fips:v8.23.0-dev
       # v4 is Chainguard's equivalent of upstream's floating :6 tag, different scheme
       - cgr.dev/defenseunicorns.com/neuvector-scanner-fips:v4
