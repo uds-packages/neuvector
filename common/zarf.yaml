@@ -13,7 +13,7 @@ components:
     charts:
       - name: crd
         url: https://neuvector.github.io/neuvector-helm/
-        version: 2.11.4
+        version: 2.12.0
         namespace: neuvector
         gitPath: charts/crd
         values:
@@ -30,7 +30,7 @@ components:
             targetPath: .
       - name: core
         url: https://neuvector.github.io/neuvector-helm/
-        version: 2.11.4
+        version: 2.12.0
         namespace: neuvector
         gitPath: charts/core
         valuesFiles:
